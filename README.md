@@ -102,11 +102,90 @@ claude
 > /harness-run Build REST API for user management
 ```
 
+## Execution Modes: Script vs Interactive vs Hybrid
+
+The harness can run in three modes. The right choice depends on project size, how much oversight you want, and how much time you have.
+
+### How They Work Under the Hood
+
+**Script mode** (`orchestrate.sh`) spawns a separate `claude -p` process for every agent call. Each process cold-starts, loads the system prompt and agent definition, does its work, exits. State passes between invocations entirely through files (`handoff.json`, contracts, eval reports).
+
+```
+orchestrate.sh
+  ├─ claude -p (planner)        → cold start → work → exit
+  ├─ claude -p (gen: contract)  → cold start → work → exit
+  ├─ claude -p (eval: review)   → cold start → work → exit
+  ├─ claude -p (generator)      → cold start → work → exit
+  ├─ claude -p (evaluator)      → cold start → work → exit
+  └─ ... repeat for each sprint
+```
+
+**Interactive mode** (`claude --agent orchestrator`) runs one persistent session. The orchestrator delegates to planner, generator, and evaluator as subagents that spawn within the same session. No cold starts -- subagents inherit the warm connection.
+
+```
+claude --agent orchestrator (one session, stays warm)
+  ├─ @planner         → subagent, fast spawn
+  ├─ @generator       → subagent, fast spawn
+  ├─ @evaluator       → subagent, fast spawn
+  ├─ @generator       → subagent (sprint 2)
+  └─ @evaluator       → subagent (sprint 2)
+```
+
+**Hybrid**: Use interactive mode for planning and early sprints (fast feedback, you can correct course), then switch to script mode for the bulk build.
+
+### Tradeoff Comparison
+
+| Factor | Script (`orchestrate.sh`) | Interactive (`--agent orchestrator`) |
+|--------|--------------------------|--------------------------------------|
+| **Speed** | Slow. Each `claude -p` cold-starts (~1-3 min overhead per call). A 3-sprint hello-world took 39 min with ~13 calls. | Fast. Subagents spawn within the warm session. Same project would take ~10-15 min. |
+| **Context isolation** | Perfect. Each call starts with a completely fresh context. No bleed between sprints. This is the paper's recommendation. | Degrades. The orchestrator's context grows as subagent results accumulate. After 5-8 sprints, context pressure builds. |
+| **Context anxiety** | Eliminated. Fresh context every time. | Risk increases with sprint count. The model may rush later sprints. |
+| **Unattended** | Yes. Fire and forget. Run overnight. | No. You're at the terminal. But you can intervene, which is sometimes what you want. |
+| **Retry logic** | Deterministic. Shell script controls max attempts, round limits. | Orchestrator agent decides. Generally reliable but less predictable. |
+| **Real-time visibility** | Claude's stderr streams to your terminal (tool calls, file edits, thinking). | Native. You see everything as it happens. |
+| **Max project size** | Unlimited sprints. Context resets mean no degradation. | ~5-8 sprints before context pressure. Viable for small-to-medium projects. |
+| **Permissions** | Uses `--dangerously-skip-permissions`. Safety comes from git isolation (sprint branches, merge-on-pass, PR review). | Uses `permissionMode: acceptEdits`. File operations auto-approved, Bash commands prompt you. |
+| **Course correction** | Stop the script, edit files, resume with `--from-sprint N`. | Intervene between any phase. Tell the orchestrator to adjust scope, skip a sprint, add guidance. |
+| **Cost tracking** | Per-invocation logging in `cost-log.json`. | Session-level only (`/cost`). |
+
+### When to Use What
+
+**Script mode** for:
+- Large projects (5+ sprints)
+- Overnight/unattended builds
+- CI/CD pipelines
+- When you trust the plan and just want results
+
+**Interactive mode** for:
+- Small projects (1-3 sprints)
+- First-time exploration of a new project type
+- When you want to review the plan before committing to a full build
+- Debugging a specific sprint that keeps failing
+- When you want to add context the agents don't have ("use Bun not npm", "the database is Postgres not SQLite")
+
+**Hybrid** (recommended for most projects):
+1. Start interactive: `/harness-plan Build a ...` -- review the spec, adjust sprint scope
+2. Run first sprint interactive: `/harness-sprint 1` -- verify the harness understands your project
+3. Switch to script for the rest: `bash harness/orchestrate.sh --resume --from-sprint 2`
+
+### Why Script Mode Is Slow (and Why That's OK)
+
+A 3-sprint project makes roughly 13 `claude -p` calls:
+- 1 planner
+- 3 contract proposals (generator)
+- 3 contract reviews (evaluator)
+- 3 implementations (generator)
+- 3 evaluations (evaluator)
+
+Each cold start takes 1-3 minutes even for trivial work. That's 13-39 minutes of overhead on top of actual work time.
+
+For a hello-world CLI, this overhead dominates -- you spend 39 minutes building something you could write in 5 minutes. But for a real project (kanban board, game engine, DAW), the overhead is amortised. A 6-hour build with 30 agent calls spends maybe 45 minutes on cold starts -- acceptable.
+
+The paper's architecture accepts this tradeoff deliberately: **context resets prevent quality degradation in later sprints**, which matters more than speed for complex builds.
+
 ## Usage
 
 ### Automated Mode (Fire and Forget)
-
-The shell script orchestrator runs the full pipeline unattended. Each agent gets a fresh context (context reset) -- no conversation history carries over between sprints, only structured files.
 
 ```bash
 # Full build
@@ -137,9 +216,9 @@ bash harness/orchestrate.sh "Build a CLI tool for managing Docker containers" \
 7. PR         Create pull request with full evaluation summary
 ```
 
-### Interactive Mode (Slash Commands)
+Claude's progress (tool calls, file edits, reasoning) streams to stderr in real-time so you can watch what each agent is doing.
 
-Run Claude Code in the project and use skills for fine-grained control:
+### Interactive Mode (Slash Commands)
 
 ```bash
 claude
@@ -201,6 +280,25 @@ claude --agent orchestrator
 ```
 
 The orchestrator delegates to planner, generator, and evaluator subagents while managing git branches, merges, and tags. You can intervene between phases.
+
+#### Hybrid Workflow (Recommended)
+
+Start interactive for planning and first-sprint validation, then switch to script for the bulk build:
+
+```bash
+# 1. Plan interactively -- review and adjust
+claude
+> /harness-plan Build a markdown knowledge base with full-text search
+# Review product-spec.md, edit sprint-plan.json if needed
+
+# 2. First sprint interactive -- verify the harness understands your project
+> /harness-sprint 1
+# Watch it work, provide guidance if needed
+
+# 3. Switch to script for the rest -- fire and forget
+# Exit claude, then:
+bash harness/orchestrate.sh --resume --from-sprint 2
+```
 
 ## Architecture
 
@@ -642,6 +740,40 @@ Options:
   --from-sprint N       Start from sprint N
   --dry-run             Show plan without executing
 ```
+
+## Testing
+
+The harness has a three-layer test suite. The `tests/` directory is for harness development only -- it is NOT copied when embedding the harness in a target project.
+
+```bash
+# Layer 1: Unit & integration tests with mock Claude (fast, free, ~10 seconds)
+bash tests/run-all.sh
+
+# Layer 2: Smoke test with real Claude (~30-40 min, uses Pro/Max plan)
+HARNESS_SMOKE_TEST=1 bash tests/run-all.sh layer2
+
+# Layer 3: Meta test -- harness builds its own test suite (~1-2 hours)
+HARNESS_META_TEST=1 bash tests/run-all.sh layer3
+
+# All layers
+HARNESS_SMOKE_TEST=1 HARNESS_META_TEST=1 bash tests/run-all.sh all
+
+# Or from within Claude Code
+> /harness-test
+> /harness-test layer2
+```
+
+### Layer 1: Mechanical (74 tests)
+
+Tests the harness plumbing with a mock `claude` script that writes fixture files instead of calling the API. Covers pure functions (`slugify`, `sprint_pad`, `json_read`), file system operations (`init_harness_state`, `update_handoff`, `update_regression_registry`), git operations in temp repos (branch, merge, tag, fail-attempt cleanup), hook validation, and the full pipeline flow with mocked agent calls.
+
+### Layer 2: Smoke Test
+
+Runs the real harness on a trivial project ("Build a hello world CLI tool") to prove the end-to-end pipeline works with actual Claude. Verifies: product spec created, sprint plan valid, eval reports exist with PASS results, git tags created, handoff populated, cost log has invocations.
+
+### Layer 3: Meta Test (Self-Referential)
+
+Uses the harness to build its own test suite. The planner analyzes the harness codebase, the generator writes bats tests, the evaluator verifies they pass. This is not circular proof -- Layer 1 (human-written) is the ground truth. The meta test demonstrates the harness can produce useful output on a complex, real-world Bash project. If the meta-generated tests catch a bug Layer 1 missed, that's genuine value.
 
 ## Credits
 
