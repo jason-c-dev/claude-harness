@@ -21,24 +21,13 @@ invoke_planner() {
 
   log_info "Invoking planner..."
 
-  local output_file
-  output_file=$(mktemp)
-  trap "rm -f '$output_file'" RETURN
-
-  # stdout (JSON result) → file, stderr (progress) → terminal
   if ! claude -p "$prompt" \
     --agent planner \
-    --output-format json \
     --max-turns 50 \
-    --dangerously-skip-permissions \
-    > "$output_file"; then
+    --dangerously-skip-permissions; then
     log_error "Planner invocation failed"
-    cat "$output_file" >&2
     return 1
   fi
-
-  local output
-  output=$(cat "$output_file")
 
   # Verify outputs
   if ! file_exists "${HARNESS_STATE}/product-spec.md"; then
@@ -59,9 +48,5 @@ invoke_planner() {
   }
 
   log_success "Planner produced spec with ${sprint_count} sprints"
-
-  # Log cost
-  log_cost "planner" 0 "$output"
-
   echo "$sprint_count"
 }

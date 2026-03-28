@@ -23,23 +23,13 @@ invoke_generator() {
 
   prompt="${prompt} When done, write your work log to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/generator-log.md and set harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/status.json to {\"status\": \"ready-for-eval\", \"attempt\": ${attempt}}."
 
-  local output_file
-  output_file=$(mktemp)
-  trap "rm -f '$output_file'" RETURN
-
   if ! claude -p "$prompt" \
     --agent generator \
-    --output-format json \
     --max-turns 200 \
-    --dangerously-skip-permissions \
-    > "$output_file"; then
+    --dangerously-skip-permissions; then
     log_error "Generator invocation failed"
-    cat "$output_file" >&2
     return 1
   fi
-
-  local output
-  output=$(cat "$output_file")
 
   # Verify outputs
   if ! file_exists "${dir}/status.json"; then
@@ -59,6 +49,5 @@ invoke_generator() {
     log_warn "Generator status is '${status}', expected 'ready-for-eval'"
   fi
 
-  log_cost "generator" "$sprint_num" "$output"
   log_success "Generator completed sprint $(sprint_pad "$sprint_num") (attempt ${attempt})"
 }

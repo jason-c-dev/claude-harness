@@ -25,24 +25,14 @@ invoke_evaluator() {
     mcp_flag="--mcp-config .mcp.json"
   fi
 
-  local output_file
-  output_file=$(mktemp)
-  trap "rm -f '$output_file'" RETURN
-
   if ! claude -p "$prompt" \
     --agent evaluator \
-    --output-format json \
     --max-turns 100 \
     --dangerously-skip-permissions \
-    ${mcp_flag} \
-    > "$output_file"; then
+    ${mcp_flag}; then
     log_error "Evaluator invocation failed"
-    cat "$output_file" >&2
     return 1
   fi
-
-  local output
-  output=$(cat "$output_file")
 
   # Verify outputs
   if ! file_exists "${dir}/eval-report.json"; then
@@ -57,8 +47,6 @@ invoke_evaluator() {
   pass_count=$(jq -r '.passCount // .pass_count // 0' "${dir}/eval-report.json" 2>/dev/null)
   fail_count=$(jq -r '.failCount // .fail_count // 0' "${dir}/eval-report.json" 2>/dev/null)
   blocking=$(jq -r '.blockingFailures // .blocking_failures // 0' "${dir}/eval-report.json" 2>/dev/null)
-
-  log_cost "evaluator" "$sprint_num" "$output"
 
   if [[ "$result" == "PASS" ]]; then
     log_success "Sprint $(sprint_pad "$sprint_num") PASSED (${pass_count} pass, ${fail_count} fail, ${blocking} blocking)"
@@ -84,19 +72,12 @@ invoke_regression() {
     mcp_flag="--mcp-config .mcp.json"
   fi
 
-  local output_file
-  output_file=$(mktemp)
-  trap "rm -f '$output_file'" RETURN
-
   if ! claude -p "$prompt" \
     --agent evaluator \
-    --output-format json \
     --max-turns 100 \
     --dangerously-skip-permissions \
-    ${mcp_flag} \
-    > "$output_file"; then
+    ${mcp_flag}; then
     log_error "Regression test invocation failed"
-    cat "$output_file" >&2
     return 1
   fi
 

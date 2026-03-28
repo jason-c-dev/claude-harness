@@ -30,10 +30,8 @@ negotiate_contract() {
 
     if ! claude -p "$gen_prompt" \
       --agent generator \
-      --output-format json \
       --max-turns 30 \
-      --dangerously-skip-permissions \
-      > /dev/null; then
+      --dangerously-skip-permissions; then
       log_error "Generator contract proposal failed"
       return 1
     fi
@@ -51,10 +49,8 @@ negotiate_contract() {
     log_info "Evaluator reviewing contract..."
     if ! claude -p "Review the sprint contract proposal at harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-proposal.json. Check that criteria are testable, complete, and cover the sprint's features from the sprint plan. Write your review to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-review.json." \
       --agent evaluator \
-      --output-format json \
       --max-turns 30 \
-      --dangerously-skip-permissions \
-      > /dev/null; then
+      --dangerously-skip-permissions; then
       log_error "Evaluator contract review failed"
       return 1
     fi
