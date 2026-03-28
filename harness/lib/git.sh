@@ -55,6 +55,10 @@ git_merge_sprint() {
 
   log_info "Merging sprint $(sprint_pad "$sprint_num") to ${harness_branch}"
 
+  # Commit any uncommitted changes on the sprint branch (evaluator may have written files)
+  git add -A 2>/dev/null || true
+  git diff --cached --quiet 2>/dev/null || git commit -q -m "harness(sprint-$(sprint_pad "$sprint_num")): evaluator artifacts"
+
   git checkout "$harness_branch"
   git merge --no-ff "$sprint_branch" \
     -m "harness(sprint-$(sprint_pad "$sprint_num")): merge (PASS, attempt ${attempt})"
@@ -86,7 +90,10 @@ git_fail_sprint_attempt() {
   log_warn "Tagged failed attempt: ${tag}"
 
   # Switch back to harness branch and delete the sprint branch
+  # Stash any uncommitted changes from the failed attempt (evaluator may have written files)
+  git stash -q 2>/dev/null || true
   git checkout "$harness_branch"
+  git stash drop -q 2>/dev/null || true
   git branch -D "$sprint_branch" 2>/dev/null || true
 }
 

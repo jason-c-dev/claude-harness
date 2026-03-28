@@ -14,15 +14,15 @@ NC='\033[0m' # No Color
 HARNESS_STATE="harness-state"
 
 log_info() {
-  echo -e "${BLUE}[harness]${NC} $*"
+  echo -e "${BLUE}[harness]${NC} $*" >&2
 }
 
 log_success() {
-  echo -e "${GREEN}[harness]${NC} $*"
+  echo -e "${GREEN}[harness]${NC} $*" >&2
 }
 
 log_warn() {
-  echo -e "${YELLOW}[harness]${NC} $*"
+  echo -e "${YELLOW}[harness]${NC} $*" >&2
 }
 
 log_error() {
@@ -30,11 +30,11 @@ log_error() {
 }
 
 log_phase() {
-  echo ""
-  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  echo -e "${CYAN}  $*${NC}"
-  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  echo ""
+  echo "" >&2
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" >&2
+  echo -e "${CYAN}  $*${NC}" >&2
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" >&2
+  echo "" >&2
 }
 
 # Pad sprint number to 2 digits

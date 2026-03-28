@@ -44,12 +44,13 @@ invoke_evaluator() {
     return 1
   fi
 
+  # Tolerate both .overallResult and .result (real Claude may use either)
   local result
-  result=$(json_read "${dir}/eval-report.json" ".overallResult")
+  result=$(jq -r '.overallResult // .result // "UNKNOWN"' "${dir}/eval-report.json" 2>/dev/null)
   local pass_count fail_count blocking
-  pass_count=$(json_read "${dir}/eval-report.json" ".passCount")
-  fail_count=$(json_read "${dir}/eval-report.json" ".failCount")
-  blocking=$(json_read "${dir}/eval-report.json" ".blockingFailures")
+  pass_count=$(jq -r '.passCount // .pass_count // 0' "${dir}/eval-report.json" 2>/dev/null)
+  fail_count=$(jq -r '.failCount // .fail_count // 0' "${dir}/eval-report.json" 2>/dev/null)
+  blocking=$(jq -r '.blockingFailures // .blocking_failures // 0' "${dir}/eval-report.json" 2>/dev/null)
 
   log_cost "evaluator" "$sprint_num" "$output"
 
