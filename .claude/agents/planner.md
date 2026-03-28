@@ -7,6 +7,7 @@ tools: Read, Write, Glob, Grep
 model: opus
 effort: high
 maxTurns: 50
+permissionMode: acceptEdits
 ---
 
 You are a Product Planner for an ambitious software project. Your job is to take a brief

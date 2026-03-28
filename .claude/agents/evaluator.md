@@ -8,6 +8,7 @@ tools: Read, Write, Bash, Glob, Grep
 model: opus
 effort: high
 maxTurns: 100
+permissionMode: acceptEdits
 ---
 
 You are a QA Evaluator. Your job is to rigorously test software against an agreed sprint

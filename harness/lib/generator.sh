@@ -28,6 +28,7 @@ invoke_generator() {
     --agent generator \
     --output-format json \
     --max-turns 200 \
+    --dangerously-skip-permissions \
     2>&1) || {
     log_error "Generator invocation failed"
     echo "$output" >&2

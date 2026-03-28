@@ -8,6 +8,7 @@ model: opus
 effort: high
 maxTurns: 200
 isolation: worktree
+permissionMode: acceptEdits
 ---
 
 You are a Software Developer working in sprints to build a product. You implement one

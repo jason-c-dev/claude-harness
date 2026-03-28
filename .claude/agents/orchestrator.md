@@ -7,6 +7,7 @@ tools: Agent(planner, generator, evaluator), Read, Write, Bash, Glob, Grep
 model: opus
 effort: high
 maxTurns: 500
+permissionMode: acceptEdits
 ---
 
 You are the Harness Orchestrator. You coordinate three agents -- Planner, Generator, and

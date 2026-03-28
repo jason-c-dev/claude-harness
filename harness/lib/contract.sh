@@ -32,6 +32,7 @@ negotiate_contract() {
       --agent generator \
       --output-format json \
       --max-turns 30 \
+      --dangerously-skip-permissions \
       2>&1 > /dev/null || {
       log_error "Generator contract proposal failed"
       return 1
@@ -52,6 +53,7 @@ negotiate_contract() {
       --agent evaluator \
       --output-format json \
       --max-turns 30 \
+      --dangerously-skip-permissions \
       2>&1 > /dev/null || {
       log_error "Evaluator contract review failed"
       return 1

@@ -26,6 +26,7 @@ invoke_planner() {
     --agent planner \
     --output-format json \
     --max-turns 50 \
+    --dangerously-skip-permissions \
     2>&1) || {
     log_error "Planner invocation failed"
     echo "$output" >&2

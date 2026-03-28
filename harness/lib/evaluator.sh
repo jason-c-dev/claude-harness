@@ -30,6 +30,7 @@ invoke_evaluator() {
     --agent evaluator \
     --output-format json \
     --max-turns 100 \
+    --dangerously-skip-permissions \
     ${mcp_flag} \
     2>&1) || {
     log_error "Evaluator invocation failed"
@@ -81,6 +82,7 @@ invoke_regression() {
     --agent evaluator \
     --output-format json \
     --max-turns 100 \
+    --dangerously-skip-permissions \
     ${mcp_flag} \
     2>&1) || {
     log_error "Regression test invocation failed"
