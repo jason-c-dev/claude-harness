@@ -81,7 +81,7 @@ assert "At least one eval report exists" \
   test -n "$(find harness-state/sprints -name 'eval-report.json' 2>/dev/null | head -1)"
 
 assert "At least one sprint PASS in eval reports" \
-  bash -c "jq -r '.overallResult' harness-state/sprints/*/eval-report.json 2>/dev/null | grep -q PASS"
+  bash -c "jq -r '.overallResult // .result' harness-state/sprints/*/eval-report.json 2>/dev/null | grep -q PASS"
 
 assert "Harness git tag exists" \
   bash -c "git tag | grep -q 'harness/'"
