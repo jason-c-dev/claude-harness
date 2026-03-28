@@ -6,6 +6,8 @@ set -euo pipefail
 SCRIPT_DIR="${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 # shellcheck source=utils.sh
 [[ -z "${HARNESS_STATE:-}" ]] && source "${SCRIPT_DIR}/utils.sh"
+# shellcheck source=invoke.sh
+source "${SCRIPT_DIR}/invoke.sh" 2>/dev/null || true
 
 negotiate_contract() {
   local sprint_num="$1"
@@ -28,10 +30,7 @@ negotiate_contract() {
       gen_prompt="${gen_prompt} The evaluator has provided feedback in harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-review.json. Address all feedback in your revised proposal."
     fi
 
-    if ! claude -p "$gen_prompt" \
-      --agent generator \
-      --max-turns 30 \
-      --dangerously-skip-permissions; then
+    if ! invoke_claude --agent generator --max-turns 30 "$gen_prompt"; then
       log_error "Generator contract proposal failed"
       return 1
     fi
@@ -47,10 +46,8 @@ negotiate_contract() {
 
     # Evaluator reviews
     log_info "Evaluator reviewing contract..."
-    if ! claude -p "Review the sprint contract proposal at harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-proposal.json. Check that criteria are testable, complete, and cover the sprint's features from the sprint plan. Write your review to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-review.json." \
-      --agent evaluator \
-      --max-turns 30 \
-      --dangerously-skip-permissions; then
+    if ! invoke_claude --agent evaluator --max-turns 30 \
+      "Review the sprint contract proposal at harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-proposal.json. Check that criteria are testable, complete, and cover the sprint's features from the sprint plan. Write your review to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-review.json."; then
       log_error "Evaluator contract review failed"
       return 1
     fi

@@ -6,6 +6,8 @@ set -euo pipefail
 SCRIPT_DIR="${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 # shellcheck source=utils.sh
 [[ -z "${HARNESS_STATE:-}" ]] && source "${SCRIPT_DIR}/utils.sh"
+# shellcheck source=invoke.sh
+source "${SCRIPT_DIR}/invoke.sh" 2>/dev/null || true
 
 invoke_generator() {
   local sprint_num="$1"
@@ -23,10 +25,7 @@ invoke_generator() {
 
   prompt="${prompt} When done, write your work log to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/generator-log.md and set harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/status.json to {\"status\": \"ready-for-eval\", \"attempt\": ${attempt}}."
 
-  if ! claude -p "$prompt" \
-    --agent generator \
-    --max-turns 200 \
-    --dangerously-skip-permissions; then
+  if ! invoke_claude --agent generator --max-turns 200 "$prompt"; then
     log_error "Generator invocation failed"
     return 1
   fi

@@ -6,6 +6,8 @@ set -euo pipefail
 SCRIPT_DIR="${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 # shellcheck source=utils.sh
 [[ -z "${HARNESS_STATE:-}" ]] && source "${SCRIPT_DIR}/utils.sh"
+# shellcheck source=invoke.sh
+source "${SCRIPT_DIR}/invoke.sh" 2>/dev/null || true
 
 invoke_evaluator() {
   local sprint_num="$1"
@@ -25,11 +27,7 @@ invoke_evaluator() {
     mcp_flag="--mcp-config .mcp.json"
   fi
 
-  if ! claude -p "$prompt" \
-    --agent evaluator \
-    --max-turns 100 \
-    --dangerously-skip-permissions \
-    ${mcp_flag}; then
+  if ! invoke_claude --agent evaluator --max-turns 100 ${mcp_flag} "$prompt"; then
     log_error "Evaluator invocation failed"
     return 1
   fi
@@ -72,11 +70,7 @@ invoke_regression() {
     mcp_flag="--mcp-config .mcp.json"
   fi
 
-  if ! claude -p "$prompt" \
-    --agent evaluator \
-    --max-turns 100 \
-    --dangerously-skip-permissions \
-    ${mcp_flag}; then
+  if ! invoke_claude --agent evaluator --max-turns 100 ${mcp_flag} "$prompt"; then
     log_error "Regression test invocation failed"
     return 1
   fi
