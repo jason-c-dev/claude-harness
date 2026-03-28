@@ -3,6 +3,7 @@
 
 # Claude Code
 .claude/worktrees/
+.claude/settings.local.json
 
 # Harness runtime (screenshots are large binaries)
 harness-state/sprints/*/screenshots/
