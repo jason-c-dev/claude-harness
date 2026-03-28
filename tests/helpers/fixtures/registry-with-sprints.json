@@ -1,0 +1,9 @@
+{
+  "sprints": {
+    "1": {
+      "criteria": ["C1-01", "C1-02", "C1-03"],
+      "contractPath": "sprints/sprint-01/contract.json"
+    }
+  },
+  "lastFullRun": "2026-01-01T00:00:00Z"
+}

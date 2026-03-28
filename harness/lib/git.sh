@@ -32,7 +32,7 @@ git_create_harness_branch() {
 git_create_sprint_branch() {
   local harness_branch="$1"
   local sprint_num="$2"
-  local sprint_branch="${harness_branch}/sprint-$(sprint_pad "$sprint_num")"
+  local sprint_branch="${harness_branch}-sprint-$(sprint_pad "$sprint_num")"
 
   log_info "Creating sprint branch: ${sprint_branch}"
 
@@ -51,7 +51,7 @@ git_merge_sprint() {
   local harness_branch="$1"
   local sprint_num="$2"
   local attempt="$3"
-  local sprint_branch="${harness_branch}/sprint-$(sprint_pad "$sprint_num")"
+  local sprint_branch="${harness_branch}-sprint-$(sprint_pad "$sprint_num")"
 
   log_info "Merging sprint $(sprint_pad "$sprint_num") to ${harness_branch}"
 
@@ -78,7 +78,7 @@ git_fail_sprint_attempt() {
   local harness_branch="$1"
   local sprint_num="$2"
   local attempt="$3"
-  local sprint_branch="${harness_branch}/sprint-$(sprint_pad "$sprint_num")"
+  local sprint_branch="${harness_branch}-sprint-$(sprint_pad "$sprint_num")"
 
   # Tag for forensics
   local tag="harness/sprint-$(sprint_pad "$sprint_num")/attempt-${attempt}"

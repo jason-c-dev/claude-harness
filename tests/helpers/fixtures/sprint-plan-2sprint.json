@@ -1,0 +1,20 @@
+{
+  "sprints": [
+    {
+      "number": 1,
+      "name": "Core Setup",
+      "theme": "Project foundation",
+      "features": ["Project structure", "Basic config"],
+      "dependsOn": [],
+      "estimatedComplexity": "low"
+    },
+    {
+      "number": 2,
+      "name": "Main Feature",
+      "theme": "Core functionality",
+      "features": ["Primary feature", "Basic tests"],
+      "dependsOn": [1],
+      "estimatedComplexity": "medium"
+    }
+  ]
+}

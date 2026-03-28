@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# Mock claude CLI for testing
+# Shadows the real `claude` binary when tests/helpers is on PATH.
+# Determines agent role and phase from arguments, writes fixture files.
+
+set -euo pipefail
+
+FIXTURE_DIR="${MOCK_CLAUDE_FIXTURE_DIR:?MOCK_CLAUDE_FIXTURE_DIR must be set}"
+SCENARIO="${MOCK_CLAUDE_SCENARIO:-pass}"
+LOG="${MOCK_CLAUDE_LOG:-/dev/null}"
+STATE_DIR="${MOCK_CLAUDE_STATE_DIR:-/tmp/mock-claude-state}"
+mkdir -p "$STATE_DIR"
+
+# Parse arguments
+AGENT=""
+PROMPT=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --agent) AGENT="$2"; shift 2 ;;
+    -p) PROMPT="$2"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+
+# Increment call counter
+CALL_COUNT_FILE="$STATE_DIR/call-count"
+if [[ -f "$CALL_COUNT_FILE" ]]; then
+  COUNT=$(( $(cat "$CALL_COUNT_FILE") + 1 ))
+else
+  COUNT=1
+fi
+echo "$COUNT" > "$CALL_COUNT_FILE"
+
+# Per-agent call counter
+AGENT_COUNT_FILE="$STATE_DIR/${AGENT:-unknown}-count"
+if [[ -f "$AGENT_COUNT_FILE" ]]; then
+  AGENT_COUNT=$(( $(cat "$AGENT_COUNT_FILE") + 1 ))
+else
+  AGENT_COUNT=1
+fi
+echo "$AGENT_COUNT" > "$AGENT_COUNT_FILE"
+
+# Log the invocation
+echo "call=$COUNT agent=$AGENT scenario=$SCENARIO prompt=$(echo "$PROMPT" | head -c 100)" >> "$LOG"
+
+# Extract sprint directory from prompt if present
+SPRINT_DIR=""
+if echo "$PROMPT" | grep -oq 'sprint-[0-9]\+'; then
+  SPRINT_NUM=$(echo "$PROMPT" | grep -o 'sprint-[0-9]\+' | head -1 | sed 's/sprint-//')
+  SPRINT_DIR="harness-state/sprints/sprint-$(printf '%02d' "$SPRINT_NUM")"
+  mkdir -p "$SPRINT_DIR"
+fi
+
+# Also check for fix/refactor sprint dirs
+if echo "$PROMPT" | grep -oq 'fix-[0-9]\+'; then
+  FIX_ID=$(echo "$PROMPT" | grep -o 'fix-[0-9]\+' | head -1)
+  SPRINT_DIR="harness-state/sprints/$FIX_ID"
+  mkdir -p "$SPRINT_DIR"
+fi
+
+# Default usage output
+usage_json() {
+  echo '{"session_id":"mock-session","usage":{"input_tokens":1000,"output_tokens":500}}'
+}
+
+# Route based on agent and prompt
+case "$AGENT" in
+  planner)
+    cp "$FIXTURE_DIR/product-spec-minimal.md" "harness-state/product-spec.md"
+    cp "$FIXTURE_DIR/sprint-plan-2sprint.json" "harness-state/sprint-plan.json"
+    usage_json
+    ;;
+
+  generator)
+    if echo "$PROMPT" | grep -iq "Propose.*contract\|contract.*propos"; then
+      # Contract proposal phase (explicitly proposing, not just mentioning "contract")
+      if [[ -n "$SPRINT_DIR" ]]; then
+        cp "$FIXTURE_DIR/contract-proposal-valid.json" "$SPRINT_DIR/contract-proposal.json"
+      fi
+    else
+      # Implementation phase (includes "Implement", "Fix", and retry prompts)
+      if [[ -n "$SPRINT_DIR" ]]; then
+        if [[ "$SCENARIO" == "fail-generator-blocked" ]]; then
+          cp "$FIXTURE_DIR/status-blocked.json" "$SPRINT_DIR/status.json"
+        else
+          cp "$FIXTURE_DIR/status-ready-for-eval.json" "$SPRINT_DIR/status.json"
+          cp "$FIXTURE_DIR/generator-log-sample.md" "$SPRINT_DIR/generator-log.md"
+        fi
+      fi
+    fi
+    usage_json
+    ;;
+
+  evaluator)
+    if echo "$PROMPT" | grep -iq "review.*contract\|contract.*review\|Review.*proposal"; then
+      # Contract review phase
+      if [[ -n "$SPRINT_DIR" ]]; then
+        if [[ "$SCENARIO" == "revise-then-accept" ]]; then
+          EVAL_COUNT=$(cat "$STATE_DIR/evaluator-count" 2>/dev/null || echo "1")
+          if [[ "$EVAL_COUNT" -le 1 ]]; then
+            cp "$FIXTURE_DIR/contract-review-revise.json" "$SPRINT_DIR/contract-review.json"
+          else
+            cp "$FIXTURE_DIR/contract-review-accepted.json" "$SPRINT_DIR/contract-review.json"
+          fi
+        else
+          cp "$FIXTURE_DIR/contract-review-accepted.json" "$SPRINT_DIR/contract-review.json"
+        fi
+      fi
+    elif echo "$PROMPT" | grep -iq "Evaluate sprint\|Test sprint"; then
+      # Sprint evaluation phase (test the running application)
+      if [[ -n "$SPRINT_DIR" ]]; then
+        if [[ "$SCENARIO" == "fail-eval" ]]; then
+          cp "$FIXTURE_DIR/eval-report-fail-blocking.json" "$SPRINT_DIR/eval-report.json"
+          echo '{"status":"fail","attempt":1,"timestamp":"2026-01-01T00:00:00Z"}' > "$SPRINT_DIR/status.json"
+        else
+          cp "$FIXTURE_DIR/eval-report-pass.json" "$SPRINT_DIR/eval-report.json"
+          echo '{"status":"pass","attempt":1,"timestamp":"2026-01-01T00:00:00Z"}' > "$SPRINT_DIR/status.json"
+        fi
+      fi
+    elif echo "$PROMPT" | grep -iq "regression"; then
+      # Standalone regression phase
+      if [[ -n "$SPRINT_DIR" ]]; then
+        if [[ "$SCENARIO" == "fail-eval" ]]; then
+          cp "$FIXTURE_DIR/eval-report-fail-blocking.json" "$SPRINT_DIR/eval-report.json"
+          echo '{"status":"fail","attempt":1,"timestamp":"2026-01-01T00:00:00Z"}' > "$SPRINT_DIR/status.json"
+        else
+          cp "$FIXTURE_DIR/eval-report-pass.json" "$SPRINT_DIR/eval-report.json"
+          echo '{"status":"pass","attempt":1,"timestamp":"2026-01-01T00:00:00Z"}' > "$SPRINT_DIR/status.json"
+        fi
+      fi
+    fi
+    usage_json
+    ;;
+
+  *)
+    echo "mock-claude: unknown agent '$AGENT'" >&2
+    usage_json
+    ;;
+esac
+
+exit 0

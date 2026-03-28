@@ -1,0 +1,6 @@
+{
+  "decision": "revise",
+  "feedback": "Add test for error handling on invalid input.",
+  "missingCriteria": ["Error handling for invalid input"],
+  "unclearCriteria": ["C1-02"]
+}

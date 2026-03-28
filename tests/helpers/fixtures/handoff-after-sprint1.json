@@ -1,0 +1,18 @@
+{
+  "projectName": "Test Project",
+  "completedSprints": [1],
+  "currentSprint": 2,
+  "totalSprints": 2,
+  "completedFeatures": ["Core Setup"],
+  "keyFiles": { "main": ["src/index.js"] },
+  "techStack": { "runtime": "node" },
+  "outstandingIssues": [],
+  "devServerCommand": "node src/index.js",
+  "devServerPort": 3000,
+  "git": {
+    "harnessBranch": "harness/test-project",
+    "latestTag": "harness/sprint-01/pass",
+    "latestMergeSha": "abc123",
+    "prNumbers": []
+  }
+}

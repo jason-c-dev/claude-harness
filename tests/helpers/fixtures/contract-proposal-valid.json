@@ -1,0 +1,32 @@
+{
+  "sprintNumber": 1,
+  "sprintName": "Core Setup",
+  "criteria": [
+    {
+      "id": "C1-01",
+      "category": "functionality",
+      "description": "Project initializes without errors",
+      "testMethod": "command",
+      "testSteps": "Run the project init command. Verify exit code 0.",
+      "threshold": "pass/fail"
+    },
+    {
+      "id": "C1-02",
+      "category": "functionality",
+      "description": "Config file is created with defaults",
+      "testMethod": "file-inspection",
+      "testSteps": "Check config.json exists with required fields.",
+      "threshold": "pass/fail"
+    },
+    {
+      "id": "C1-03",
+      "category": "functionality",
+      "description": "Help command outputs usage info",
+      "testMethod": "command",
+      "testSteps": "Run with --help flag. Verify output contains usage.",
+      "threshold": "pass/fail"
+    }
+  ],
+  "outOfScope": ["Advanced features"],
+  "regressionSprints": []
+}
