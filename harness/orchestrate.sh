@@ -28,6 +28,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/utils.sh"
+source "${SCRIPT_DIR}/lib/invoke.sh"
 source "${SCRIPT_DIR}/lib/git.sh"
 source "${SCRIPT_DIR}/lib/planner.sh"
 source "${SCRIPT_DIR}/lib/contract.sh"

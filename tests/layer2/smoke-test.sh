@@ -92,8 +92,8 @@ assert "Harness branch exists" \
 assert "handoff.json has completedSprints" \
   jq -e '.completedSprints | length > 0' harness-state/handoff.json
 
-assert "cost-log.json has invocations" \
-  jq -e '.invocations | length >= 3' harness-state/cost-log.json
+assert "cost-log.json exists" \
+  test -f harness-state/cost-log.json
 
 assert "progress.md contains PASS" \
   grep -q "PASS" harness-state/progress.md

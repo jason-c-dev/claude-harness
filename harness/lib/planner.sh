@@ -6,8 +6,6 @@ set -euo pipefail
 SCRIPT_DIR="${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 # shellcheck source=utils.sh
 [[ -z "${HARNESS_STATE:-}" ]] && source "${SCRIPT_DIR}/utils.sh"
-# shellcheck source=invoke.sh
-source "${SCRIPT_DIR}/invoke.sh" 2>/dev/null || true
 
 invoke_planner() {
   local mode="${1:-new}"  # "new" or "extend"
