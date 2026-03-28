@@ -40,7 +40,9 @@ chmod +x harness/orchestrate.sh harness/lib/*.sh harness/hooks/*.sh
 echo "Starting harness (this may take 10-30 minutes)..."
 START_TIME=$(date +%s)
 
-timeout 1800 bash harness/orchestrate.sh \
+# Use gtimeout on macOS, timeout on Linux
+TIMEOUT_CMD=$(command -v gtimeout || command -v timeout || echo "")
+${TIMEOUT_CMD:+$TIMEOUT_CMD 1800} bash harness/orchestrate.sh \
   "Build a hello world CLI tool in bash that prints 'Hello, NAME' when given a name argument and 'Hello, World' with no arguments" \
   --project-type cli-tool \
   --max-cost 50 \

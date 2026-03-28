@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Source utils if not already loaded
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 # shellcheck source=utils.sh
 [[ -z "${HARNESS_STATE:-}" ]] && source "${SCRIPT_DIR}/utils.sh"
 
