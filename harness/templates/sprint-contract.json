@@ -1,0 +1,16 @@
+{
+  "sprintNumber": 0,
+  "sprintName": "",
+  "criteria": [
+    {
+      "id": "C0-01",
+      "category": "functionality",
+      "description": "Description of what must be true",
+      "testMethod": "visual|interaction|api|command|file-inspection",
+      "testSteps": "Step-by-step instructions to verify",
+      "threshold": "pass/fail"
+    }
+  ],
+  "outOfScope": [],
+  "regressionSprints": []
+}

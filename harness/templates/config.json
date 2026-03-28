@@ -1,0 +1,10 @@
+{
+  "userPrompt": "",
+  "projectType": "general",
+  "contextStrategy": "reset",
+  "model": "opus",
+  "maxSprintAttempts": 3,
+  "maxContractRounds": 3,
+  "costCapPerSprint": 25.00,
+  "totalCostCap": 200.00
+}

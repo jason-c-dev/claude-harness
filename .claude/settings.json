@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "SubagentStop": [
+      {
+        "matcher": "generator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "harness/hooks/on-generator-stop.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "evaluator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "harness/hooks/on-evaluator-stop.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "harness/hooks/on-stop.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

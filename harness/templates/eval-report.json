@@ -1,0 +1,33 @@
+{
+  "sprintNumber": 0,
+  "attempt": 1,
+  "timestamp": "",
+  "overallResult": "PASS|FAIL",
+  "scores": {
+    "dimension1": { "score": 0, "max": 10, "threshold": 0, "pass": false },
+    "dimension2": { "score": 0, "max": 10, "threshold": 0, "pass": false },
+    "dimension3": { "score": 0, "max": 10, "threshold": 0, "pass": false },
+    "dimension4": { "score": 0, "max": 10, "threshold": 0, "pass": false }
+  },
+  "criteriaResults": [
+    {
+      "id": "C0-01",
+      "result": "PASS|FAIL",
+      "evidence": "",
+      "severity": "blocking|non-blocking",
+      "codeLocation": "",
+      "suggestedFix": ""
+    }
+  ],
+  "regression": {
+    "sprintsChecked": [],
+    "criteriaChecked": 0,
+    "pass": 0,
+    "fail": 0,
+    "failures": []
+  },
+  "passCount": 0,
+  "failCount": 0,
+  "blockingFailures": 0,
+  "summary": ""
+}
