@@ -28,15 +28,15 @@ negotiate_contract() {
       gen_prompt="${gen_prompt} The evaluator has provided feedback in harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-review.json. Address all feedback in your revised proposal."
     fi
 
-    claude -p "$gen_prompt" \
+    if ! claude -p "$gen_prompt" \
       --agent generator \
       --output-format json \
       --max-turns 30 \
       --dangerously-skip-permissions \
-      2>&1 > /dev/null || {
+      > /dev/null; then
       log_error "Generator contract proposal failed"
       return 1
-    }
+    fi
 
     if ! file_exists "${dir}/contract-proposal.json"; then
       log_error "Generator did not produce contract-proposal.json"
@@ -49,15 +49,15 @@ negotiate_contract() {
 
     # Evaluator reviews
     log_info "Evaluator reviewing contract..."
-    claude -p "Review the sprint contract proposal at harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-proposal.json. Check that criteria are testable, complete, and cover the sprint's features from the sprint plan. Write your review to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-review.json." \
+    if ! claude -p "Review the sprint contract proposal at harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-proposal.json. Check that criteria are testable, complete, and cover the sprint's features from the sprint plan. Write your review to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract-review.json." \
       --agent evaluator \
       --output-format json \
       --max-turns 30 \
       --dangerously-skip-permissions \
-      2>&1 > /dev/null || {
+      > /dev/null; then
       log_error "Evaluator contract review failed"
       return 1
-    }
+    fi
 
     if ! file_exists "${dir}/contract-review.json"; then
       log_error "Evaluator did not produce contract-review.json"

@@ -25,18 +25,24 @@ invoke_evaluator() {
     mcp_flag="--mcp-config .mcp.json"
   fi
 
-  local output
-  output=$(claude -p "$prompt" \
+  local output_file
+  output_file=$(mktemp)
+  trap "rm -f '$output_file'" RETURN
+
+  if ! claude -p "$prompt" \
     --agent evaluator \
     --output-format json \
     --max-turns 100 \
     --dangerously-skip-permissions \
     ${mcp_flag} \
-    2>&1) || {
+    > "$output_file"; then
     log_error "Evaluator invocation failed"
-    echo "$output" >&2
+    cat "$output_file" >&2
     return 1
-  }
+  fi
+
+  local output
+  output=$(cat "$output_file")
 
   # Verify outputs
   if ! file_exists "${dir}/eval-report.json"; then
@@ -78,18 +84,21 @@ invoke_regression() {
     mcp_flag="--mcp-config .mcp.json"
   fi
 
-  local output
-  output=$(claude -p "$prompt" \
+  local output_file
+  output_file=$(mktemp)
+  trap "rm -f '$output_file'" RETURN
+
+  if ! claude -p "$prompt" \
     --agent evaluator \
     --output-format json \
     --max-turns 100 \
     --dangerously-skip-permissions \
     ${mcp_flag} \
-    2>&1) || {
+    > "$output_file"; then
     log_error "Regression test invocation failed"
-    echo "$output" >&2
+    cat "$output_file" >&2
     return 1
-  }
+  fi
 
   if file_exists "${HARNESS_STATE}/regression/last-run.json"; then
     local total_pass total_fail

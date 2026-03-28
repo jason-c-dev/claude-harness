@@ -21,17 +21,24 @@ invoke_planner() {
 
   log_info "Invoking planner..."
 
-  local output
-  output=$(claude -p "$prompt" \
+  local output_file
+  output_file=$(mktemp)
+  trap "rm -f '$output_file'" RETURN
+
+  # stdout (JSON result) → file, stderr (progress) → terminal
+  if ! claude -p "$prompt" \
     --agent planner \
     --output-format json \
     --max-turns 50 \
     --dangerously-skip-permissions \
-    2>&1) || {
+    > "$output_file"; then
     log_error "Planner invocation failed"
-    echo "$output" >&2
+    cat "$output_file" >&2
     return 1
-  }
+  fi
+
+  local output
+  output=$(cat "$output_file")
 
   # Verify outputs
   if ! file_exists "${HARNESS_STATE}/product-spec.md"; then
