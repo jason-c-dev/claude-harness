@@ -37,6 +37,11 @@ if [[ -d "${HARNESS_ROOT}/.claude" ]]; then
   mkdir -p .claude
   cp -rn "${HARNESS_ROOT}/.claude/agents" .claude/ 2>/dev/null || true
   cp -rn "${HARNESS_ROOT}/.claude/skills" .claude/ 2>/dev/null || true
+
+  # Gitignore harness infrastructure so it doesn't pollute the target repo
+  if ! grep -q '.claude/agents/' .gitignore 2>/dev/null; then
+    echo -e "\n# Harness infrastructure (not project code)\n.claude/agents/\n.claude/skills/" >> .gitignore
+  fi
 fi
 
 source "${SCRIPT_DIR}/lib/utils.sh"
