@@ -278,6 +278,15 @@ EOF
     check_cost_cap
   done
 
+  # Generate README
+  if [[ "$failed_sprints" -eq 0 ]]; then
+    log_info "Generating README..."
+    invoke_claude --agent generator --max-turns 30 \
+      "Read harness-state/product-spec.md for the product vision and features. Read harness-state/handoff.json for the tech stack and dev server command. Read harness-state/progress.md for what was built across sprints. Write a comprehensive README.md for this project covering: what it is, features, how to install and run (dev + build), tech stack, and project structure. Do NOT mention the harness or sprint process -- write it as a normal project README." || true
+    git add README.md 2>/dev/null || true
+    git_commit_harness_state "harness: generate README.md"
+  fi
+
   # Completion
   log_phase "HARNESS COMPLETE"
 
