@@ -1,0 +1,6 @@
+{
+  "decision": "revise",
+  "feedback": "Add tests for error handling and edge cases.",
+  "missingCriteria": ["Error handling for invalid input", "Edge case for empty string"],
+  "unclearCriteria": ["C1-02"]
+}
