@@ -1,0 +1,262 @@
+{
+  "sprintNumber": 3,
+  "sprintName": "State Management Unit Tests",
+  "features": [
+    "F5: Unit Tests for State Management Functions (meta-tests/test-utils-state.bats)"
+  ],
+  "criteria": [
+    {
+      "id": "C3-01",
+      "category": "structure",
+      "description": "File meta-tests/test-utils-state.bats exists and loads the test helper via 'load helpers/test-helper'",
+      "testMethod": "file-inspection",
+      "testSteps": "Verify meta-tests/test-utils-state.bats exists. Read the file and confirm it contains \"load 'helpers/test-helper'\" (or equivalent load directive).",
+      "threshold": "File exists and loads test-helper"
+    },
+    {
+      "id": "C3-02",
+      "category": "structure",
+      "description": "test-utils-state.bats sources harness/lib/utils.sh via source_harness_lib in setup so all state management functions are available",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-utils-state.bats. Verify it calls source_harness_lib 'utils.sh' in a setup function before any tests run.",
+      "threshold": "source_harness_lib 'utils.sh' is called in setup before tests execute"
+    },
+    {
+      "id": "C3-03",
+      "category": "functionality",
+      "description": "init_harness_state: creates config.json with correct userPrompt and projectType from arguments",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls init_harness_state with a prompt string and project type, then asserts config.json exists and contains the correct .userPrompt and .projectType values.",
+      "threshold": "Test passes, config.json has correct userPrompt and projectType"
+    },
+    {
+      "id": "C3-04",
+      "category": "functionality",
+      "description": "init_harness_state: creates all required files (config.json, cost-log.json, regression/registry.json, progress.md)",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls init_harness_state and then asserts all four files exist: harness-state/config.json, harness-state/cost-log.json, harness-state/regression/registry.json, harness-state/progress.md.",
+      "threshold": "Test passes, all four files exist after init"
+    },
+    {
+      "id": "C3-05",
+      "category": "functionality",
+      "description": "init_harness_state: cost-log.json starts with empty invocations array and totalCost of 0",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls init_harness_state and asserts cost-log.json has .invocations as an empty array and .totalCost as 0.",
+      "threshold": "Test passes, cost-log.json has empty invocations and totalCost=0"
+    },
+    {
+      "id": "C3-06",
+      "category": "functionality",
+      "description": "init_harness_state: regression/registry.json starts with empty sprints object and lastFullRun as null",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls init_harness_state and asserts registry.json has .sprints as an empty object {} and .lastFullRun as null.",
+      "threshold": "Test passes, registry.json has empty sprints and null lastFullRun"
+    },
+    {
+      "id": "C3-07",
+      "category": "functionality",
+      "description": "init_harness_state: progress.md contains the project prompt text and model name",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls init_harness_state with a known prompt, then asserts progress.md contains that prompt string and the model name.",
+      "threshold": "Test passes, progress.md contains prompt and model"
+    },
+    {
+      "id": "C3-08",
+      "category": "functionality",
+      "description": "init_harness_state: respects environment variables MODEL, CONTEXT_STRATEGY, MAX_SPRINT_ATTEMPTS, COST_CAP_PER_SPRINT, TOTAL_COST_CAP",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test sets environment variables (e.g., MODEL=sonnet, MAX_SPRINT_ATTEMPTS=5) before calling init_harness_state, then asserts config.json reflects those custom values instead of defaults.",
+      "threshold": "Test passes, config.json contains values from environment variables"
+    },
+    {
+      "id": "C3-09",
+      "category": "functionality",
+      "description": "init_harness_state: config.json uses correct defaults when environment variables are not set",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test unsets relevant environment variables before calling init_harness_state, then asserts config.json has default values (model=opus, contextStrategy=reset, maxSprintAttempts=3, etc.).",
+      "threshold": "Test passes, config.json has default values"
+    },
+    {
+      "id": "C3-10",
+      "category": "functionality",
+      "description": "log_cost: appends an entry to cost-log.json with correct role, sprint, and token counts",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test initializes cost-log.json, calls log_cost with a role, sprint number, and JSON containing usage.input_tokens and usage.output_tokens, then asserts the entry was appended with correct values.",
+      "threshold": "Test passes, entry has correct role, sprint, inputTokens, outputTokens"
+    },
+    {
+      "id": "C3-11",
+      "category": "functionality",
+      "description": "log_cost: handles missing usage fields gracefully, defaulting token counts to 0",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls log_cost with JSON output missing usage fields (e.g., '{}') and asserts the entry has inputTokens=0 and outputTokens=0 without error.",
+      "threshold": "Test passes, token counts default to 0"
+    },
+    {
+      "id": "C3-12",
+      "category": "functionality",
+      "description": "log_cost: multiple calls accumulate entries in the invocations array",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls log_cost multiple times (e.g., 3 times) and asserts cost-log.json .invocations array has the expected number of entries (3).",
+      "threshold": "Test passes, invocations array length matches number of log_cost calls"
+    },
+    {
+      "id": "C3-13",
+      "category": "functionality",
+      "description": "update_progress: appends a sprint entry to progress.md with correct sprint name from sprint-plan.json",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test installs sprint-plan-3sprint.json fixture, calls update_progress with a sprint number, and asserts progress.md contains the sprint name from the plan.",
+      "threshold": "Test passes, progress.md contains sprint name from sprint-plan.json"
+    },
+    {
+      "id": "C3-14",
+      "category": "functionality",
+      "description": "update_progress: includes status and attempt number in the appended entry",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_progress with a specific status (e.g., 'PASS') and attempt (e.g., 2), then asserts progress.md contains '**Status**: PASS' and '**Attempt**: 2'.",
+      "threshold": "Test passes, progress.md contains correct status and attempt"
+    },
+    {
+      "id": "C3-15",
+      "category": "functionality",
+      "description": "update_progress: includes merge SHA in the entry when provided",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_progress with a merge_sha argument (e.g., 'abc123') and asserts progress.md contains that SHA value.",
+      "threshold": "Test passes, merge SHA appears in progress.md"
+    },
+    {
+      "id": "C3-16",
+      "category": "functionality",
+      "description": "update_progress: omits merge SHA line when merge_sha argument is empty or not provided",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_progress without a merge_sha (or with empty string) and asserts progress.md does not contain 'Merge commit' line.",
+      "threshold": "Test passes, no merge commit line when SHA not provided"
+    },
+    {
+      "id": "C3-17",
+      "category": "functionality",
+      "description": "update_handoff: creates handoff.json from scratch when the file does not exist",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test ensures handoff.json does not exist, calls update_handoff, and asserts handoff.json was created with the correct structure (completedSprints, currentSprint, git fields).",
+      "threshold": "Test passes, handoff.json created with correct initial structure"
+    },
+    {
+      "id": "C3-18",
+      "category": "functionality",
+      "description": "update_handoff: adds sprint number to completedSprints array",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_handoff with a sprint number and asserts .completedSprints contains that number.",
+      "threshold": "Test passes, completedSprints includes the sprint number"
+    },
+    {
+      "id": "C3-19",
+      "category": "functionality",
+      "description": "update_handoff: updates currentSprint to N+1",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_handoff with sprint number N and asserts .currentSprint equals N+1.",
+      "threshold": "Test passes, currentSprint is sprint_num + 1"
+    },
+    {
+      "id": "C3-20",
+      "category": "functionality",
+      "description": "update_handoff: updates git.latestTag and git.latestMergeSha",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_handoff with tag and SHA arguments, then asserts .git.latestTag and .git.latestMergeSha match those values.",
+      "threshold": "Test passes, git fields contain provided tag and SHA"
+    },
+    {
+      "id": "C3-21",
+      "category": "functionality",
+      "description": "update_handoff: idempotent -- calling with the same sprint number twice does not duplicate in completedSprints",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_handoff with sprint 1 twice, then asserts .completedSprints contains sprint 1 exactly once (no duplicates).",
+      "threshold": "Test passes, completedSprints has no duplicate entries"
+    },
+    {
+      "id": "C3-22",
+      "category": "functionality",
+      "description": "update_handoff: preserves existing fields (projectName, techStack, etc.) when updating",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test creates a handoff.json with custom projectName and other fields, calls update_handoff, then asserts the pre-existing fields are still present and unchanged.",
+      "threshold": "Test passes, pre-existing fields remain intact after update"
+    },
+    {
+      "id": "C3-23",
+      "category": "functionality",
+      "description": "update_regression_registry: extracts criteria IDs from contract.json and adds sprint entry to registry",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test installs contract-3criteria.json fixture to the sprint directory, calls update_regression_registry, and asserts registry.json has a sprint entry with the correct criteria IDs and contract path.",
+      "threshold": "Test passes, registry has sprint entry with criteria array and contractPath"
+    },
+    {
+      "id": "C3-24",
+      "category": "functionality",
+      "description": "update_regression_registry: no-op when contract file is missing (does not create registry entry)",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test calls update_regression_registry without any contract file and asserts registry.json remains unchanged (no new sprint entry).",
+      "threshold": "Test passes, registry unchanged when contract missing"
+    },
+    {
+      "id": "C3-25",
+      "category": "functionality",
+      "description": "update_regression_registry: no-op when contract file is empty (zero bytes)",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test creates an empty contract file (touch), calls update_regression_registry, and asserts registry.json remains unchanged.",
+      "threshold": "Test passes, registry unchanged when contract empty"
+    },
+    {
+      "id": "C3-26",
+      "category": "functionality",
+      "description": "update_regression_registry: handles contract with no criteria array gracefully",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-state.bats. Verify a test installs contract-empty-criteria.json (which has .criteria as empty array), calls update_regression_registry, and asserts the sprint entry has an empty criteria array (no crash or error).",
+      "threshold": "Test passes, sprint entry created with empty criteria array"
+    },
+    {
+      "id": "C3-27",
+      "category": "integration",
+      "description": "All tests in test-utils-state.bats pass when run via bash meta-tests/run.sh",
+      "testMethod": "command",
+      "testSteps": "Run: bash meta-tests/run.sh 2>&1. Verify exit code 0 and all tests in test-utils-state.bats pass (no failures reported).",
+      "threshold": "Exit code 0, all tests pass"
+    },
+    {
+      "id": "C3-28",
+      "category": "quality",
+      "description": "Test names follow the 'function_name: description of behavior' naming convention consistently",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-utils-state.bats. Verify every @test name follows the pattern 'function_name: description of behavior' (e.g., 'init_harness_state: creates config.json with correct prompt'). Each test name clearly identifies which function is tested and the specific behavior asserted.",
+      "threshold": "All @test names follow 'function: behavior' naming convention"
+    },
+    {
+      "id": "C3-29",
+      "category": "regression",
+      "description": "Sprint 1 regression: bash meta-tests/run.sh still executes successfully and all infrastructure tests pass",
+      "testMethod": "command",
+      "testSteps": "Run: bash meta-tests/run.sh 2>&1. Verify test-infrastructure.bats tests still pass. Verify run.sh discovers and runs all .bats files including the new test-utils-state.bats.",
+      "threshold": "All sprint 1 infrastructure tests still pass"
+    },
+    {
+      "id": "C3-30",
+      "category": "regression",
+      "description": "Sprint 2 regression: all pure function tests in test-utils-pure.bats still pass",
+      "testMethod": "command",
+      "testSteps": "Run: bash meta-tests/run.sh 2>&1. Verify all tests in test-utils-pure.bats still pass (slugify, sprint_pad, sprint_dir, json_read, file_exists).",
+      "threshold": "All sprint 2 pure function tests still pass"
+    }
+  ],
+  "outOfScope": [
+    "Git operation tests (Sprint 4: test-git.bats -- git_create_harness_branch, git_create_sprint_branch, git_merge_sprint, etc.)",
+    "Hook validation tests (Sprint 5: test-hooks.bats -- on-generator-stop.sh, on-evaluator-stop.sh, on-stop.sh)",
+    "Edge case and error handling tests (Sprint 6: test-edge-cases.bats)",
+    "Any modifications to the existing harness source code in harness/lib/utils.sh",
+    "Any modifications to the existing tests/ directory",
+    "Any modifications to sprint 1 deliverables (run.sh, test-helper.bash, fixtures, test-infrastructure.bats)",
+    "Any modifications to sprint 2 deliverables (test-utils-pure.bats)",
+    "CI/CD pipeline integration",
+    "Performance benchmarks or timing assertions",
+    "check_cost_cap function testing (uses log_info, no testable state mutation)"
+  ],
+  "regressionSprints": [1, 2]
+}
