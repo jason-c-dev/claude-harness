@@ -17,12 +17,12 @@ invoke_claude() {
     esac
   done
 
-  # Use --permission-mode dontAsk (auto-approves but still runs hooks)
-  # NOT --dangerously-skip-permissions (which skips hooks entirely)
+  # --dangerously-skip-permissions bypasses permission prompts but hooks still fire.
+  # --permission-mode dontAsk DENIES Write/Bash entirely -- do NOT use it.
   local -a cmd=(claude -p "$prompt"
     --agent "$agent"
     --max-turns "$max_turns"
-    --permission-mode dontAsk
+    --dangerously-skip-permissions
     --output-format stream-json
     --verbose
   )
