@@ -1,28 +1,28 @@
 {
   "sprintNumber": 6,
   "overallResult": "PASS",
+  "timestamp": "2026-03-28T22:00:00Z",
   "attempt": 1,
-  "timestamp": "2026-03-28T12:00:00Z",
   "criteriaResults": [
     {
       "id": "C6-01",
       "result": "PASS",
-      "evidence": "meta-tests/test-edge-cases.bats exists, contains #!/usr/bin/env bats shebang, and has load 'helpers/test-helper' at line 5."
+      "evidence": "meta-tests/test-edge-cases.bats exists (303 lines), has shebang '#!/usr/bin/env bats' at line 1, loads helper via \"load 'helpers/test-helper'\" at line 5."
     },
     {
       "id": "C6-02",
       "result": "PASS",
-      "evidence": "Running 'bats meta-tests/test-edge-cases.bats' exits with code 0. All 21 tests pass (1..21, all 'ok')."
+      "evidence": "bats meta-tests/test-edge-cases.bats exits 0. All 21 tests pass: '1..21' with every test 'ok'. No failures."
     },
     {
       "id": "C6-03",
       "result": "PASS",
-      "evidence": "Running 'bash meta-tests/run.sh' exits with code 0. All 132 tests pass. Summary line present: 'Meta-tests completed in 11s (exit code: 0)'."
+      "evidence": "bash meta-tests/run.sh exits 0. All 132 tests pass. Summary line: 'Meta-tests completed in 11s (exit code: 0)'."
     },
     {
       "id": "C6-04",
       "result": "PASS",
-      "evidence": "grep -c '@test ' meta-tests/test-edge-cases.bats returns 21. Threshold is >= 15. Tests cover slugify, json_read, init_harness_state, update_handoff, update_regression_registry, git_create_sprint_branch, on-generator-stop, on-stop, log_cost, and update_progress."
+      "evidence": "grep -c '@test ' reports 21 test blocks in test-edge-cases.bats, exceeding the minimum threshold of 15."
     },
     {
       "id": "C6-05",
@@ -32,120 +32,136 @@
     {
       "id": "C6-06",
       "result": "PASS",
-      "evidence": "Test at line 37: 'slugify: string containing only spaces returns empty string' passes '     ' to slugify and asserts output == '' and status == 0."
+      "evidence": "Test at line 37: 'slugify: string containing only spaces returns empty string' passes '     ' (5 spaces) to slugify and asserts output == '' and status == 0."
     },
     {
       "id": "C6-07",
       "result": "PASS",
-      "evidence": "Test at line 72: 'json_read: binary file does not crash and returns empty string' creates binary file with printf '\\x00\\x01...', calls json_read, asserts status == 0 and output == ''."
+      "evidence": "Test at line 72: 'json_read: binary file does not crash and returns empty string' creates binary file with printf '\\x00\\x01\\x02\\x03\\x04\\x05', calls json_read, asserts status == 0 and output == ''."
     },
     {
       "id": "C6-08",
       "result": "PASS",
-      "evidence": "Test at line 79: 'json_read: truncated JSON returns empty string without crashing' creates file with '{\"name\": ', calls json_read, asserts status == 0 and output == ''."
+      "evidence": "Test at line 79: 'json_read: truncated JSON returns empty string without crashing' creates file with '{\"name\": ' (incomplete JSON), calls json_read with '.name', asserts status == 0 and output == ''."
     },
     {
       "id": "C6-09",
       "result": "PASS",
-      "evidence": "Test at line 86: 'json_read: deeply nested path returns correct value' creates JSON with .a.b.c.d.e = 'deep-value', reads with 5-level path, asserts output == 'deep-value'."
+      "evidence": "Test at line 86: 'json_read: deeply nested path returns correct value' creates 5-level nested JSON (.a.b.c.d.e = 'deep-value'), calls json_read with '.a.b.c.d.e', asserts output == 'deep-value'."
     },
     {
       "id": "C6-10",
       "result": "PASS",
-      "evidence": "Test at line 123: 'init_harness_state: prompt with double quotes and single quotes produces valid JSON'. Passes prompt with both quote types, verifies jq -e . succeeds and userPrompt contains the quoted content."
+      "evidence": "Test at line 123 covers double quotes and single quotes in one prompt. Test at line 155 covers backslashes separately. Both verify jq -e returns 0 (valid JSON) and userPrompt contains the original text. Combined coverage satisfies the criterion."
     },
     {
       "id": "C6-11",
       "result": "PASS",
-      "evidence": "Test at line 137: 'init_harness_state: prompt with newlines produces valid JSON'. Uses $'...\\n...' syntax, verifies jq -e . succeeds and userPrompt preserves all three lines."
+      "evidence": "Test at line 137: 'init_harness_state: prompt with newlines produces valid JSON' uses $'Build an app\\nwith multiple\\nlines', asserts jq -e . returns 0 and userPrompt field preserves all three line segments."
     },
     {
       "id": "C6-12",
       "result": "PASS",
-      "evidence": "Test at line 172: 'update_handoff: called before init_harness_state creates handoff.json from scratch'. Removes handoff.json, calls update_handoff, verifies file created with completedSprints, currentSprint, and git fields."
+      "evidence": "Test at line 172: 'update_handoff: called before init_harness_state creates handoff.json from scratch' removes handoff.json, calls update_handoff, asserts file exists with completedSprints, currentSprint, git.harnessBranch, git.latestTag, git.latestMergeSha fields."
     },
     {
       "id": "C6-13",
       "result": "PASS",
-      "evidence": "Test at line 198: 'update_regression_registry: malformed contract JSON does not crash and preserves registry'. Creates 'not json at all' as contract, runs update_regression_registry, verifies registry.json remains valid JSON."
+      "evidence": "Test at line 198: 'update_regression_registry: malformed contract JSON does not crash and preserves registry' pre-seeds valid registry, writes 'not json at all' as contract, calls update_regression_registry, verifies registry.json is still parseable by jq -e."
     },
     {
       "id": "C6-14",
       "result": "PASS",
-      "evidence": "Test at line 217: 'git_create_sprint_branch: fails gracefully when harness branch does not exist'. Inits repo without harness branch, calls function, verifies non-zero exit code and no orphan branch created."
+      "evidence": "Test at line 217: 'git_create_sprint_branch: fails gracefully when harness branch does not exist' calls with 'harness/nonexistent-branch', asserts exit_code != 0 and verifies no orphan branch was created via git branch --list."
     },
     {
       "id": "C6-15",
       "result": "PASS",
-      "evidence": "Test at line 239: 'on-generator-stop: multiple sprint directories with mixed statuses picks active one and blocks'. Creates sprint-01/pass and sprint-02/active, verifies exit code 2."
+      "evidence": "Test at line 239: 'on-generator-stop: multiple sprint directories with mixed statuses picks active one and blocks' creates sprint-01/pass + sprint-02/active, runs hook, asserts exit code == 2."
     },
     {
       "id": "C6-16",
       "result": "PASS",
-      "evidence": "Test at line 252: 'on-generator-stop: hooks work from working directory with harness-state at expected relative path'. Creates harness-state in test temp dir, runs hook, verifies exit 0 -- confirming hooks read from cwd/harness-state/."
+      "evidence": "Test at line 252: 'on-generator-stop: hooks work from working directory with harness-state at expected relative path' sets up harness-state/ at expected relative path in TEST_TEMP_DIR, runs hook from that directory, verifies exit 0."
     },
     {
       "id": "C6-17",
       "result": "PASS",
-      "evidence": "Test at line 264: 'on-stop: sprint-plan exists but no sprint directories at all allows exit'. Installs sprint-plan-3sprint.json but creates no sprint directories, verifies exit 0."
+      "evidence": "Test at line 264: 'on-stop: sprint-plan exists but no sprint directories at all allows exit' installs sprint-plan-3sprint.json fixture but creates no sprint directories, runs on-stop.sh, asserts exit 0."
     },
     {
       "id": "C6-18",
       "result": "PASS",
-      "evidence": "Test at line 275: 'log_cost: non-JSON output_json argument does not crash and defaults to 0 tokens'. Passes 'this is not json', verifies cost-log.json exists, inputTokens=0, outputTokens=0."
+      "evidence": "Test at line 275: 'log_cost: non-JSON output_json argument does not crash and defaults to 0 tokens' passes 'this is not json' as third arg, verifies cost-log.json exists and invocations[0].inputTokens == 0, outputTokens == 0."
     },
     {
       "id": "C6-19",
       "result": "PASS",
-      "evidence": "Test at line 293: 'update_progress: works when sprint-plan.json is missing'. Creates progress.md only, calls update_progress, verifies 'Sprint 01' and 'PASS' are appended."
+      "evidence": "Test at line 293: 'update_progress: works when sprint-plan.json is missing' creates progress.md but no sprint-plan.json, calls update_progress, verifies no crash and 'Sprint 01' + 'PASS' appended to progress.md."
     },
     {
       "id": "C6-20",
       "result": "PASS",
-      "evidence": "run.sh output contains 'Meta-tests completed in 11s (exit code: 0)' -- matches expected 'Meta-tests completed in' pattern with duration and exit code."
+      "evidence": "run.sh output ends with 'Meta-tests completed in 11s (exit code: 0)' matching expected 'Meta-tests completed in' format with duration and exit code."
     },
     {
       "id": "C6-21",
       "result": "PASS",
-      "evidence": "Running 'bash meta-tests/run.sh --filter slugify' exits 0, shows 14 slugify tests, no unrelated tests (e.g., sprint_pad, json_read) in output."
+      "evidence": "bash meta-tests/run.sh --filter 'slugify' exits 0, outputs 14 slugify-matching tests. grep -c 'sprint_pad' on filtered output returns 0. Filter correctly limits execution."
     },
     {
       "id": "C6-22",
       "result": "PASS",
-      "evidence": "setup() at lines 7-25 creates TEST_TEMP_DIR via mktemp -d, cds into it, sets HARNESS_STATE='harness-state' relative to temp dir. All tests create files in $TEST_TEMP_DIR or $HARNESS_STATE (within temp). No test references the project's actual harness-state/ path. Teardown in test-helper.bash removes TEST_TEMP_DIR."
+      "evidence": "setup() at lines 8-25 creates TEST_TEMP_DIR via mktemp -d, cd's into it, sets HARNESS_STATE='harness-state' relative to temp dir. All tests operate under $TEST_TEMP_DIR. Only reference to literal 'harness-state/' is in a comment (line 253). No test writes to the project's actual harness-state/ directory."
     },
     {
       "id": "C6-23",
       "result": "PASS",
-      "evidence": "All 21 @test names follow 'function_name: description' pattern (e.g., 'slugify: string containing only special characters returns empty string', 'json_read: binary file does not crash', 'on-generator-stop: multiple sprint directories...'). Verified by grep output of all @test lines."
+      "evidence": "All 21 test names follow 'function_or_module: description' pattern. Examples: 'slugify: string containing only special characters returns empty string', 'json_read: binary file does not crash', 'on-generator-stop: multiple sprint directories with mixed statuses picks active one and blocks', 'log_cost: non-JSON output_json argument does not crash and defaults to 0 tokens'."
     },
     {
       "id": "C6-24",
       "result": "PASS",
-      "evidence": "Error/edge tests consistently check both exit status and output/state: slugify edge tests check status==0 AND output==''; json_read edge tests check status==0 AND output==''; git_create_sprint_branch checks exit_code!=0 AND verifies no orphan branch; log_cost checks file exists AND field values==0; update_regression_registry checks function runs AND registry remains valid JSON."
+      "evidence": "All error/edge tests verify both exit status AND output/state: slugify tests assert status==0 + output==''; json_read tests assert status==0 + output==''; git_create_sprint_branch asserts exit_code!=0 + no orphan branch; log_cost asserts file exists + field values==0; registry test asserts function completes + registry remains valid JSON."
     },
     {
       "id": "C6-25",
       "result": "PASS",
-      "evidence": "Total @test count across all .bats files: test-edge-cases=21, test-git=25, test-hooks=28, test-infrastructure=8, test-utils-pure=26, test-utils-state=24. Sum=132. Threshold is >= 80."
+      "evidence": "Total @test count: test-edge-cases(21) + test-git(25) + test-hooks(28) + test-infrastructure(8) + test-utils-pure(26) + test-utils-state(24) = 132. Threshold >= 80."
     }
   ],
   "regressionResults": {
-    "sprints": [1, 2, 3, 4, 5],
+    "sprintsTested": [1, 2, 3, 4, 5],
     "result": "PASS",
-    "evidence": "All 6 .bats files run individually: test-infrastructure.bats (8/8), test-utils-pure.bats (26/26), test-utils-state.bats (24/24), test-git.bats (25/25), test-hooks.bats (28/28), test-edge-cases.bats (21/21). Full suite via run.sh: 132/132 pass with exit 0. No regressions detected."
+    "evidence": "Full suite via 'bash meta-tests/run.sh' ran all 132 tests across 6 .bats files. All sprint 1-5 tests continue to pass: test-infrastructure(8/8), test-utils-pure(26/26), test-utils-state(24/24), test-git(25/25), test-hooks(28/28). Zero regressions."
   },
   "holistic": {
-    "codeQuality": 9,
-    "codeQualityNotes": "Clean, well-organized test file with clear section headers. Tests follow consistent naming convention. Good use of existing test helper infrastructure. Proper isolation via setup/teardown. The custom setup() in test-edge-cases.bats correctly re-implements the test-helper setup pattern plus additional env var clearing.",
-    "completeness": 9,
-    "completenessNotes": "21 edge case tests covering 8 distinct modules (slugify, json_read, init_harness_state, update_handoff, update_regression_registry, git_create_sprint_branch, hooks, log_cost, update_progress). All 25 contract criteria satisfied. Total suite now at 132 tests across 6 files.",
-    "robustness": 9,
-    "robustnessNotes": "Tests cover genuine edge cases: binary input, truncated JSON, special characters, newlines in prompts, missing prerequisites, malformed data. The git edge case test properly avoids bats 'run' to catch set -e failures. Error tests verify both status and state.",
-    "ux": 8,
-    "uxNotes": "CLI tool project type: run.sh provides summary line with timing and exit code, --filter flag works correctly. Test output is readable TAP format. Test names are descriptive and follow consistent convention."
+    "profile": "cli-tool",
+    "dimensions": {
+      "correctness": {
+        "score": 10,
+        "notes": "All 132 tests pass with zero failures. All 21 new edge case tests pass. No regressions across any prior sprint."
+      },
+      "robustness": {
+        "score": 9,
+        "notes": "Edge cases thoroughly tested: binary files, truncated JSON, special characters, newlines, backslashes, missing prerequisites, malformed data, non-existent branches. Tests verify graceful degradation. Minor: C6-10 splits quotes and backslashes into separate tests rather than combining."
+      },
+      "codeQuality": {
+        "score": 9,
+        "notes": "Consistent naming convention, proper test isolation via setup(), clear section headers, focused single-purpose tests. Good reuse of test-helper infrastructure (install_fixture, assert_json_field, init_test_repo, source_harness_lib, run_hook)."
+      },
+      "completeness": {
+        "score": 9,
+        "notes": "All 25 contract criteria satisfied. Tests cover 9 distinct functions/modules. 132 total tests well above the 80 threshold. Edge cases span the full harness: utils, state, git, hooks."
+      },
+      "ux": {
+        "score": 9,
+        "notes": "run.sh provides clear summary with timing and exit code. --filter flag works correctly for selective execution. TAP output for CI pipelines. Descriptive test names make failures immediately actionable."
+      }
+    },
+    "primaryScore": 9.2,
+    "threshold": 7.0
   },
-  "primaryScore": 9,
   "blockingFailures": [],
-  "notes": "Sprint 6 delivers a comprehensive edge case test suite that thoroughly covers boundary conditions, malformed input, and error recovery across all harness modules. All 25 criteria pass. The full 132-test suite runs in ~11 seconds with zero failures. No regressions from sprints 1-5."
+  "summary": "Sprint 6 PASS. All 25 criteria met. 21 edge case tests added covering boundary conditions across all harness modules: slugify (special chars, spaces, empty, unicode, max length), json_read (binary, truncated, deeply nested, whitespace), init_harness_state (quotes, newlines, backslashes), update_handoff (cold start), registry (malformed JSON), git (non-existent branch), hooks (mixed statuses, relative paths, missing directories), log_cost (non-JSON input), update_progress (missing plan). Full regression suite of 132 tests passes with zero regressions from sprints 1-5. Primary score 9.2/10."
 }
