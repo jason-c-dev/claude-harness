@@ -5,9 +5,10 @@
     2,
     3,
     4,
-    5
+    5,
+    6
   ],
-  "currentSprint": 6,
+  "currentSprint": 7,
   "totalSprints": 0,
   "completedFeatures": [],
   "keyFiles": {},
@@ -17,8 +18,8 @@
   "devServerPort": 0,
   "git": {
     "harnessBranch": "harness/build-a-comprehensive-bats-core-test-suite-for-thi",
-    "latestTag": "harness/sprint-05/pass",
-    "latestMergeSha": "Deleted branch harness/build-a-comprehensive-bats-core-test-suite-for-thi-sprint-05 (was c0744a6).\nb3419b0c585f253cffc8cc2bcbd16ad2224046cf",
+    "latestTag": "harness/sprint-06/pass",
+    "latestMergeSha": "Deleted branch harness/build-a-comprehensive-bats-core-test-suite-for-thi-sprint-06 (was 7d6fe64).\n01a954f934148a82d101521e430438cb54e2ed66",
     "prNumbers": []
   }
 }

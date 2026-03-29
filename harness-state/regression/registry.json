@@ -172,6 +172,36 @@
         "C5-30"
       ],
       "contractPath": "sprints/sprint-05/contract.json"
+    },
+    "6": {
+      "criteria": [
+        "C6-01",
+        "C6-02",
+        "C6-03",
+        "C6-04",
+        "C6-05",
+        "C6-06",
+        "C6-07",
+        "C6-08",
+        "C6-09",
+        "C6-10",
+        "C6-11",
+        "C6-12",
+        "C6-13",
+        "C6-14",
+        "C6-15",
+        "C6-16",
+        "C6-17",
+        "C6-18",
+        "C6-19",
+        "C6-20",
+        "C6-21",
+        "C6-22",
+        "C6-23",
+        "C6-24",
+        "C6-25"
+      ],
+      "contractPath": "sprints/sprint-06/contract.json"
     }
   },
   "lastFullRun": null
