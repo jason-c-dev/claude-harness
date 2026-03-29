@@ -2,7 +2,7 @@
   "sprintNumber": 3,
   "sprintName": "State Management Unit Tests",
   "overallResult": "PASS",
-  "timestamp": "2026-03-29T01:45:00Z",
+  "timestamp": "2026-03-28T18:30:00Z",
   "attempt": 1,
   "blockingFailures": 0,
   "totalCriteria": 30,
@@ -12,180 +12,184 @@
     {
       "id": "C3-01",
       "result": "PASS",
-      "evidence": "File meta-tests/test-utils-state.bats exists. Line 5 contains: load 'helpers/test-helper'"
+      "evidence": "File meta-tests/test-utils-state.bats exists (12499 bytes, 331 lines). Line 5 contains: load 'helpers/test-helper'."
     },
     {
       "id": "C3-02",
       "result": "PASS",
-      "evidence": "Lines 7-25 define setup() which calls source_harness_lib 'utils.sh' at line 24, before any @test blocks."
+      "evidence": "Lines 7-25 define setup() which calls source_harness_lib 'utils.sh' at line 24, after creating temp dir and setting HARNESS_STATE. Runs before every @test block."
     },
     {
       "id": "C3-03",
       "result": "PASS",
-      "evidence": "Test 'init_harness_state: creates config.json with correct userPrompt and projectType' (lines 31-37) calls init_harness_state with args and asserts config.json has correct .userPrompt and .projectType. Test passes (ok 35 in TAP output)."
+      "evidence": "Test 'init_harness_state: creates config.json with correct userPrompt and projectType' (lines 31-37) calls init_harness_state with args 'Build a web app' and 'web-app', asserts both fields via assert_json_field. Test #35 passed."
     },
     {
       "id": "C3-04",
       "result": "PASS",
-      "evidence": "Test 'init_harness_state: creates all required files' (lines 39-46) verifies all four files exist: config.json, cost-log.json, regression/registry.json, progress.md. Test passes (ok 36)."
+      "evidence": "Test 'init_harness_state: creates all required files' (lines 39-46) asserts existence of config.json, cost-log.json, regression/registry.json, progress.md. Test #36 passed."
     },
     {
       "id": "C3-05",
       "result": "PASS",
-      "evidence": "Test at lines 48-56 asserts invocations array length is 0 and totalCost is '0'. Test passes (ok 37)."
+      "evidence": "Test (lines 48-56) checks jq '.invocations | length' is 0 and assert_json_field .totalCost is '0'. Test #37 passed."
     },
     {
       "id": "C3-06",
       "result": "PASS",
-      "evidence": "Test at lines 58-66 asserts sprints object length is 0 and lastFullRun is 'null'. Test passes (ok 38)."
+      "evidence": "Test (lines 58-66) checks jq '.sprints | length' is 0 and assert_json_field .lastFullRun is 'null'. Test #38 passed."
     },
     {
       "id": "C3-07",
       "result": "PASS",
-      "evidence": "Test at lines 68-73 calls init_harness_state with 'Build a REST API', then greps progress.md for the prompt and 'opus'. Test passes (ok 39)."
+      "evidence": "Test (lines 68-73) calls init_harness_state with 'Build a REST API', greps progress.md for prompt text and 'opus'. Test #39 passed."
     },
     {
       "id": "C3-08",
       "result": "PASS",
-      "evidence": "Test at lines 75-89 sets MODEL=sonnet, CONTEXT_STRATEGY=continue, MAX_SPRINT_ATTEMPTS=5, COST_CAP_PER_SPRINT=50.00, TOTAL_COST_CAP=500.00, then asserts all values in config.json. Test passes (ok 40)."
+      "evidence": "Test (lines 75-89) exports MODEL=sonnet, CONTEXT_STRATEGY=continue, MAX_SPRINT_ATTEMPTS=5, COST_CAP_PER_SPRINT=50.00, TOTAL_COST_CAP=500.00. Asserts all values reflected in config.json. Test #40 passed."
     },
     {
       "id": "C3-09",
       "result": "PASS",
-      "evidence": "Test at lines 91-99 unsets env vars in setup(), calls init_harness_state, and asserts defaults: model=opus, contextStrategy=reset, maxSprintAttempts=3, costCapPerSprint=25.00, totalCostCap=200.00. All match source code defaults at utils.sh:78-84. Test passes (ok 41)."
+      "evidence": "Test (lines 91-99) unsets env vars in setup(), asserts defaults: model=opus, contextStrategy=reset, maxSprintAttempts=3, costCapPerSprint=25.00, totalCostCap=200.00. Verified these match utils.sh line 84 defaults. Test #41 passed."
     },
     {
       "id": "C3-10",
       "result": "PASS",
-      "evidence": "Test at lines 105-116 initializes cost-log.json, calls log_cost 'generator' 2 with usage JSON (input_tokens: 1500, output_tokens: 800), then asserts .invocations[0] has correct role, sprint, inputTokens, outputTokens. Test passes (ok 42)."
+      "evidence": "Test (lines 105-116) initializes cost-log.json, calls log_cost 'generator' 2 with usage JSON (input_tokens:1500, output_tokens:800). Asserts .invocations[0] has correct role, sprint, inputTokens, outputTokens. Test #42 passed."
     },
     {
       "id": "C3-11",
       "result": "PASS",
-      "evidence": "Test at lines 118-125 calls log_cost with '{}' (no usage fields) and asserts inputTokens=0 and outputTokens=0. Test passes (ok 43)."
+      "evidence": "Test (lines 118-125) calls log_cost with '{}' and asserts inputTokens=0 and outputTokens=0. No error produced. Test #43 passed."
     },
     {
       "id": "C3-12",
       "result": "PASS",
-      "evidence": "Test at lines 127-137 calls log_cost 3 times and asserts invocations array length is 3. Test passes (ok 44)."
+      "evidence": "Test (lines 127-137) calls log_cost 3 times (planner, generator, evaluator), asserts invocations array length is 3. Test #44 passed."
     },
     {
       "id": "C3-13",
       "result": "PASS",
-      "evidence": "Test at lines 143-151 installs sprint-plan-3sprint.json fixture, calls update_progress 1 'PASS' 1 '', then greps for 'Foundation Setup' (sprint name from fixture). Test passes (ok 45)."
+      "evidence": "Test (lines 143-151) installs sprint-plan-3sprint.json fixture, calls update_progress 1 'PASS' 1 '', greps for 'Foundation Setup' (sprint 1 name from fixture). Test #45 passed."
     },
     {
       "id": "C3-14",
       "result": "PASS",
-      "evidence": "Test at lines 153-161 calls update_progress 2 'PASS' 2 '' and asserts progress.md contains '**Status**: PASS' and '**Attempt**: 2'. Test passes (ok 46)."
+      "evidence": "Test (lines 153-161) calls update_progress 2 'PASS' 2 '', asserts progress.md contains '**Status**: PASS' and '**Attempt**: 2'. Test #46 passed."
     },
     {
       "id": "C3-15",
       "result": "PASS",
-      "evidence": "Test at lines 163-169 calls update_progress with merge_sha 'abc123def456' and greps for it in progress.md. Test passes (ok 47)."
+      "evidence": "Test (lines 163-169) calls update_progress with merge_sha 'abc123def456', greps for SHA in progress.md. Test #47 passed."
     },
     {
       "id": "C3-16",
       "result": "PASS",
-      "evidence": "Test at lines 172-179 calls update_progress with empty merge_sha and asserts 'Merge commit' does NOT appear in progress.md using negated grep. Test passes (ok 48)."
+      "evidence": "Test (lines 172-179) calls update_progress with empty merge_sha, asserts 'Merge commit' does NOT appear via negated grep. Test #48 passed."
     },
     {
       "id": "C3-17",
       "result": "PASS",
-      "evidence": "Test at lines 185-196 ensures handoff.json does not exist (rm -f), calls update_handoff 1, then asserts the file was created with completedSprints, currentSprint, and git fields. Test passes (ok 49)."
+      "evidence": "Test (lines 185-196) removes handoff.json, calls update_handoff, asserts file created with .completedSprints, .currentSprint, .git structure. Test #49 passed."
     },
     {
       "id": "C3-18",
       "result": "PASS",
-      "evidence": "Test at lines 198-206 calls update_handoff 1, then asserts .completedSprints contains 1 via jq index check. Test passes (ok 50)."
+      "evidence": "Test (lines 198-206) calls update_handoff 1, verifies .completedSprints contains 1 via jq 'index(1) != null'. Test #50 passed."
     },
     {
       "id": "C3-19",
       "result": "PASS",
-      "evidence": "Test at lines 208-213 calls update_handoff 3, then asserts .currentSprint equals 4. Test passes (ok 51)."
+      "evidence": "Test (lines 208-213) calls update_handoff 3, asserts .currentSprint equals 4 (N+1). Test #51 passed."
     },
     {
       "id": "C3-20",
       "result": "PASS",
-      "evidence": "Test at lines 216-223 calls update_handoff with tag 'harness/sprint-01/pass' and SHA 'merge-sha-abc', then asserts .git.latestTag and .git.latestMergeSha match. Test passes (ok 52)."
+      "evidence": "Test (lines 216-223) calls update_handoff with tag 'harness/sprint-01/pass' and SHA 'merge-sha-abc', asserts both .git fields match. Test #52 passed."
     },
     {
       "id": "C3-21",
       "result": "PASS",
-      "evidence": "Test at lines 225-233 calls update_handoff with sprint 1 twice, then counts occurrences of 1 in completedSprints and asserts exactly 1. Test passes (ok 53)."
+      "evidence": "Test (lines 225-234) calls update_handoff with sprint 1 twice, counts occurrences of 1 in completedSprints array, asserts exactly 1 (no duplicates). Test #53 passed."
     },
     {
       "id": "C3-22",
       "result": "PASS",
-      "evidence": "Test at lines 236-267 creates handoff.json with custom fields (projectName='My Custom Project', techStack.runtime='node', devServerCommand='npm start', etc.), calls update_handoff, then asserts all pre-existing fields remain intact. Test passes (ok 54)."
+      "evidence": "Test (lines 236-267) creates handoff.json with projectName, techStack, devServerCommand, devServerPort, completedFeatures, outstandingIssues. After update_handoff, asserts all 6 pre-existing fields preserved. Test #54 passed."
     },
     {
       "id": "C3-23",
       "result": "PASS",
-      "evidence": "Test at lines 273-292 installs contract-3criteria.json fixture, calls update_regression_registry 1, then asserts registry has sprint entry with criteria 'C1-01,C1-02,C1-03' and correct contractPath. Test passes (ok 55)."
+      "evidence": "Test (lines 273-292) installs contract-3criteria.json, calls update_regression_registry 1, asserts criteria='C1-01,C1-02,C1-03' and contractPath='sprints/sprint-01/contract.json'. Test #55 passed."
     },
     {
       "id": "C3-24",
       "result": "PASS",
-      "evidence": "Test at lines 294-303 calls update_regression_registry without any contract file and asserts registry sprints length is 0. Test passes (ok 56)."
+      "evidence": "Test (lines 294-303) calls update_regression_registry with no contract file, asserts sprints length 0. Test #56 passed."
     },
     {
       "id": "C3-25",
       "result": "PASS",
-      "evidence": "Test at lines 305-317 creates empty contract file via touch, calls update_regression_registry, and asserts registry unchanged (sprints length 0). Test passes (ok 57)."
+      "evidence": "Test (lines 305-316) creates empty contract via touch, calls update_regression_registry, asserts registry unchanged (sprints length 0). Test #57 passed."
     },
     {
       "id": "C3-26",
       "result": "PASS",
-      "evidence": "Test at lines 319-331 installs contract-empty-criteria.json fixture (empty criteria array), calls update_regression_registry, and asserts sprint entry has criteria length 0. Test passes (ok 58)."
+      "evidence": "Test (lines 319-331) installs contract-empty-criteria.json, calls update_regression_registry, asserts sprint entry has criteria length 0. Test #58 passed."
     },
     {
       "id": "C3-27",
       "result": "PASS",
-      "evidence": "Full test suite run via 'bash meta-tests/run.sh' exits with code 0. All 58 tests pass (including all 24 state management tests). TAP output shows ok 35-58 for test-utils-state.bats."
+      "evidence": "'bash meta-tests/run.sh' exited code 0. TAP output: 1..58, all ok. All test-utils-state.bats tests (ok 35-58) passed. Completed in 3s."
     },
     {
       "id": "C3-28",
       "result": "PASS",
-      "evidence": "All 24 @test names in test-utils-state.bats follow the 'function_name: description' pattern. Functions tested: init_harness_state (7 tests), log_cost (3 tests), update_progress (4 tests), update_handoff (6 tests), update_regression_registry (4 tests)."
+      "evidence": "All 24 @test names follow 'function_name: description' pattern. Functions: init_harness_state (7 tests), log_cost (3), update_progress (4), update_handoff (6), update_regression_registry (4). Each name identifies function and specific behavior."
     },
     {
       "id": "C3-29",
       "result": "PASS",
-      "evidence": "Sprint 1 regression: all 8 test-infrastructure.bats tests pass (ok 1-8 in TAP output). run.sh discovers all 3 .bats files including the new test-utils-state.bats. No sprint 1 files were modified (confirmed via git diff)."
+      "evidence": "Sprint 1 regression: all 8 test-infrastructure.bats tests pass (ok 1-8). run.sh discovers all 3 .bats files. No sprint 1 files modified (git diff confirms only test-utils-state.bats added)."
     },
     {
       "id": "C3-30",
       "result": "PASS",
-      "evidence": "Sprint 2 regression: all 26 test-utils-pure.bats tests pass (ok 9-34 in TAP output). Covers slugify (9 tests), sprint_pad (4), sprint_dir (3), json_read (6), file_exists (4). No sprint 2 files were modified (confirmed via git diff)."
+      "evidence": "Sprint 2 regression: all 26 test-utils-pure.bats tests pass (ok 9-34). slugify (9), sprint_pad (4), sprint_dir (3), json_read (6), file_exists (4) all pass. No sprint 2 files modified."
     }
   ],
   "regressionResults": {
-    "sprint1": "PASS - All 8 infrastructure tests pass. No sprint 1 files modified.",
-    "sprint2": "PASS - All 26 pure function tests pass. No sprint 2 files modified."
+    "sprint1": "PASS -- All 8 infrastructure tests pass. No sprint 1 files modified.",
+    "sprint2": "PASS -- All 26 pure function tests pass. No sprint 2 files modified."
   },
   "holistic": {
-    "correctness": {
-      "score": 10,
-      "notes": "All 24 new state management tests pass. Tests correctly validate init_harness_state, log_cost, update_progress, update_handoff, and update_regression_registry. Test assertions accurately match the source code behavior in harness/lib/utils.sh."
+    "projectType": "cli-tool",
+    "dimensions": {
+      "correctness": {
+        "score": 10,
+        "notes": "All 24 new state management tests pass. Tests accurately validate init_harness_state, log_cost, update_progress, update_handoff, and update_regression_registry against utils.sh behavior."
+      },
+      "completeness": {
+        "score": 10,
+        "notes": "Every contracted function covered: init_harness_state (7 tests: creation, defaults, env overrides), log_cost (3: normal, missing fields, accumulation), update_progress (4: sprint name, status/attempt, SHA presence/absence), update_handoff (6: creation, completedSprints, currentSprint, git fields, idempotency, field preservation), update_regression_registry (4: normal, missing contract, empty contract, empty criteria)."
+      },
+      "errorHandling": {
+        "score": 9,
+        "notes": "Good edge case coverage: missing usage fields default to 0, missing contracts are no-ops, empty contracts are no-ops, empty criteria handled gracefully, idempotent updates. Minor gap: no test for malformed JSON input to log_cost."
+      },
+      "codeQuality": {
+        "score": 9,
+        "notes": "Well-organized with section separators, consistent naming, proper use of helpers. Setup overrides test-helper setup() (valid bats pattern) while inheriting teardown(). Each test is isolated via temp directories."
+      },
+      "maintainability": {
+        "score": 9,
+        "notes": "Self-documenting test names, no ordering dependencies, reuses sprint 1 fixtures. Easy to extend with additional tests. Run time under 3s for 58 tests."
+      }
     },
-    "completeness": {
-      "score": 10,
-      "notes": "Every function listed in the sprint scope is covered: init_harness_state (7 tests covering creation, defaults, env var overrides), log_cost (3 tests covering normal, missing fields, accumulation), update_progress (4 tests covering sprint name, status/attempt, merge SHA presence/absence), update_handoff (6 tests covering creation, completedSprints, currentSprint, git fields, idempotency, field preservation), update_regression_registry (4 tests covering normal, missing contract, empty contract, empty criteria)."
-    },
-    "codeQuality": {
-      "score": 9,
-      "notes": "Clean, well-organized test file with clear section headers. Consistent naming convention. Proper use of setup() with env var clearing. Good use of helper functions (assert_json_field, install_fixture). Minor note: the setup() overrides the test-helper's setup() rather than calling it, which duplicates some logic, but this is a valid bats pattern and works correctly since teardown() is inherited."
-    },
-    "testing": {
-      "score": 10,
-      "notes": "This IS the test deliverable. Tests are thorough, covering happy paths, edge cases (missing files, empty files, missing fields), idempotency, and field preservation. Each test is isolated via temp directories."
-    },
-    "ux": {
-      "score": 9,
-      "notes": "Test names are descriptive and follow consistent convention. TAP output is clear. Tests run quickly (2-3 seconds for all 58 tests). Fixture-based testing is clean and maintainable."
-    }
+    "primaryScore": 9.4,
+    "threshold": 7.0
   },
-  "primaryScore": 9.6,
-  "notes": "Sprint 3 is a clean, complete implementation. All 30 criteria pass including 24 new state management tests and 2 regression checks. The test file is well-structured with clear section separators, consistent naming, and thorough coverage of all five state management functions. No modifications were made to sprint 1 or sprint 2 deliverables. The full suite of 58 tests runs in under 3 seconds."
+  "summary": "Sprint 3 PASS. All 30 criteria satisfied. 24 new unit tests for state management functions in test-utils-state.bats, all passing. Full suite: 58/58 tests pass in 3s. Regression sprints 1 and 2 fully intact. No source code modified -- only the new test file was added."
 }
