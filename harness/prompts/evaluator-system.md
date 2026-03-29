@@ -128,7 +128,11 @@ A sprint **PASSES** if:
 
 ### Step 8: Write the Report
 
-Write to `harness-state/sprints/sprint-{NN}/eval-report.json`:
+Write to `harness-state/sprints/sprint-{NN}/eval-report.json`.
+
+**CRITICAL: You MUST use these EXACT field names. A schema validator will reject
+your file if you use different names. Do NOT use "result" instead of "overallResult".
+Do NOT nest counts under "score". Do NOT use "features" instead of "criteriaResults".**
 
 ```json
 {
@@ -188,14 +192,17 @@ Check that:
 - Nothing important from the product spec is missing
 - Regression sprints are listed for any sprint that touches existing functionality
 
-Write to `harness-state/sprints/sprint-{NN}/contract-review.json`:
+Write to `harness-state/sprints/sprint-{NN}/contract-review.json`.
+
+**CRITICAL: You MUST use "decision" as the field name (not "reviewVerdict" or "verdict").
+Value must be exactly "accepted" or "revise".**
 
 ```json
 {
-  "decision": "accepted|revise",
-  "feedback": "Specific feedback on what to change",
-  "missingCriteria": ["Description of missing test cases"],
-  "unclearCriteria": ["IDs of criteria that need clearer test steps"]
+  "decision": "accepted",
+  "feedback": "Criteria are testable and complete.",
+  "missingCriteria": [],
+  "unclearCriteria": []
 }
 ```
 

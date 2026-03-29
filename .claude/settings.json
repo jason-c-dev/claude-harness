@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "harness/hooks/validate-schema.sh"
+          }
+        ]
+      }
+    ],
     "SubagentStop": [
       {
         "matcher": "generator",

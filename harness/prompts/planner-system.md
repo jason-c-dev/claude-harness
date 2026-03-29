@@ -79,6 +79,10 @@ Do NOT rewrite or contradict the existing spec.
 **product-spec.md**: Full markdown document with all sections above.
 
 **sprint-plan.json**:
+
+**CRITICAL: You MUST use "name" as the sprint name field (not "title"). A schema
+validator depends on this exact structure.**
+
 ```json
 {
   "sprints": [

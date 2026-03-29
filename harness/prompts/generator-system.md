@@ -22,24 +22,36 @@ If this sprint has a previous failed attempt, the evaluator's feedback is in:
 **Only if no `contract.json` exists for your sprint.**
 
 Read the product spec and sprint plan. For your assigned sprint, propose a contract by
-writing to `harness-state/sprints/sprint-{NN}/contract-proposal.json`:
+writing to `harness-state/sprints/sprint-{NN}/contract-proposal.json`.
+
+**CRITICAL: You MUST use the EXACT field names shown below. A schema validator will
+reject your file if you use "features", "acceptanceCriteria", or "deliverables" instead
+of "criteria". Each criterion MUST have "id", "description", "testMethod", and "testSteps".**
 
 ```json
 {
-  "sprintNumber": N,
-  "sprintName": "Name from sprint plan",
+  "sprintNumber": 1,
+  "sprintName": "Core Setup",
   "criteria": [
     {
-      "id": "CN-01",
-      "category": "functionality|interaction|api|visual",
-      "description": "Specific, testable criterion",
-      "testMethod": "visual|interaction|api|command|file-inspection",
-      "testSteps": "Step-by-step instructions to verify this criterion",
+      "id": "C1-01",
+      "category": "functionality",
+      "description": "Project initializes without errors",
+      "testMethod": "command",
+      "testSteps": "Run npm run dev. Verify exit code 0 and server starts.",
+      "threshold": "pass/fail"
+    },
+    {
+      "id": "C1-02",
+      "category": "functionality",
+      "description": "Config file created with defaults",
+      "testMethod": "file-inspection",
+      "testSteps": "Check config.json exists with required fields.",
       "threshold": "pass/fail"
     }
   ],
-  "outOfScope": ["Things explicitly NOT in this sprint"],
-  "regressionSprints": [1, 2]
+  "outOfScope": ["Advanced features not in this sprint"],
+  "regressionSprints": []
 }
 ```
 

@@ -63,13 +63,20 @@ FAIL if: any blocking criterion fails, any regression fails, or primary score be
 ### Step 8: Write Report
 Write to `harness-state/sprints/sprint-{NN}/eval-report.json` and update `status.json`.
 
+**CRITICAL: Use EXACT field names. A schema validator will REJECT your file otherwise.**
+- Use `"overallResult"` (not "result" or "verdict"). Value: `"PASS"` or `"FAIL"` (uppercase).
+- Use `"criteriaResults"` array (not "features" or "results").
+- Use `"passCount"` and `"failCount"` as top-level integers (not nested under "score").
+
 ## Contract Review Mode
 
 If reviewing a proposal (`contract-proposal.json` exists, `contract.json` does not):
 - Check criteria are testable and specific
 - Check coverage against sprint plan features
 - Check regression sprints are listed
-Write review to `contract-review.json` with decision: "accepted" or "revise".
+
+**CRITICAL: Use `"decision"` field (not "reviewVerdict"). Value: `"accepted"` or `"revise"`.**
+Write review to `contract-review.json`.
 
 ## Calibration
 
