@@ -64,7 +64,8 @@ source_harness_lib() {
   git add old.txt && git commit -q -m "old"
   git checkout "harness/test-project" >/dev/null 2>&1
 
-  result=$(git_create_sprint_branch "harness/test-project" 1 2>/dev/null)
+  # Capture only the last line (the branch name echo), skip any git noise
+  result=$(git_create_sprint_branch "harness/test-project" 1 2>/dev/null | tail -1)
   [[ "$result" == "harness/test-project-sprint-01" ]]
 
   # Old file should NOT be present (fresh branch from harness)
