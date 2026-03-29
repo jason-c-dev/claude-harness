@@ -58,13 +58,13 @@ source_harness_lib() {
 }
 
 @test "git_create_sprint_branch: cleans up existing branch" {
-  git_create_harness_branch "test-project"
-  git checkout -b "harness/test-project-sprint-01"
+  git_create_harness_branch "test-project" >/dev/null 2>&1
+  git checkout -b "harness/test-project-sprint-01" >/dev/null 2>&1
   echo "old work" > old.txt
   git add old.txt && git commit -q -m "old"
-  git checkout "harness/test-project"
+  git checkout "harness/test-project" >/dev/null 2>&1
 
-  result=$(git_create_sprint_branch "harness/test-project" 1)
+  result=$(git_create_sprint_branch "harness/test-project" 1 2>/dev/null)
   [[ "$result" == "harness/test-project-sprint-01" ]]
 
   # Old file should NOT be present (fresh branch from harness)
