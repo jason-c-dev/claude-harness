@@ -23,7 +23,7 @@ git_create_harness_branch() {
   fi
 
   log_info "Creating harness branch: ${harness_branch} from ${base_branch}"
-  git checkout -b "$harness_branch" "$base_branch" 2>/dev/null || git checkout "$harness_branch"
+  (git checkout -b "$harness_branch" "$base_branch" 2>/dev/null || git checkout "$harness_branch") >&2
 
   echo "$harness_branch"
 }
@@ -41,7 +41,7 @@ git_create_sprint_branch() {
     git branch -D "$sprint_branch" 2>/dev/null || true
   fi
 
-  git checkout -b "$sprint_branch" "$harness_branch"
+  git checkout -b "$sprint_branch" "$harness_branch" >&2
 
   echo "$sprint_branch"
 }
@@ -59,9 +59,9 @@ git_merge_sprint() {
   git add -A 2>/dev/null || true
   git diff --cached --quiet 2>/dev/null || git commit -q -m "harness(sprint-$(sprint_pad "$sprint_num")): evaluator artifacts"
 
-  git checkout "$harness_branch"
+  git checkout "$harness_branch" >&2
   git merge --no-ff "$sprint_branch" \
-    -m "harness(sprint-$(sprint_pad "$sprint_num")): merge (PASS, attempt ${attempt})"
+    -m "harness(sprint-$(sprint_pad "$sprint_num")): merge (PASS, attempt ${attempt})" >&2
 
   local merge_sha
   merge_sha=$(git rev-parse HEAD)
