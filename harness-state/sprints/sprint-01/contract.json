@@ -1,0 +1,263 @@
+{
+  "sprintNumber": 1,
+  "sprintName": "Test Infrastructure Foundation",
+  "features": [
+    "F1: Test Runner Entry Point (meta-tests/run.sh)",
+    "F2: Test Helper Library (meta-tests/helpers/test-helper.bash)",
+    "F3: Fixture Files (meta-tests/helpers/fixtures/)"
+  ],
+  "criteria": [
+    {
+      "id": "C1-01",
+      "category": "structure",
+      "description": "Directory structure: meta-tests/ directory exists with helpers/ and helpers/fixtures/ subdirectories",
+      "testMethod": "file-inspection",
+      "testSteps": "Verify directories exist: meta-tests/, meta-tests/helpers/, meta-tests/helpers/fixtures/",
+      "threshold": "All three directories exist"
+    },
+    {
+      "id": "C1-02",
+      "category": "functionality",
+      "description": "run.sh exists at meta-tests/run.sh and is executable (chmod +x)",
+      "testMethod": "command",
+      "testSteps": "Check file exists and has executable permission: test -x meta-tests/run.sh",
+      "threshold": "pass/fail"
+    },
+    {
+      "id": "C1-03",
+      "category": "functionality",
+      "description": "run.sh checks for bats prerequisite and prints install instructions if missing",
+      "testMethod": "command",
+      "testSteps": "Temporarily modify PATH to hide bats, run meta-tests/run.sh. Verify it exits non-zero and stderr contains install instruction text mentioning 'bats'.",
+      "threshold": "Exit code non-zero and stderr mentions bats installation"
+    },
+    {
+      "id": "C1-04",
+      "category": "functionality",
+      "description": "run.sh checks for jq prerequisite and prints install instructions if missing",
+      "testMethod": "command",
+      "testSteps": "Temporarily modify PATH to hide jq, run meta-tests/run.sh. Verify it exits non-zero and stderr contains install instruction text mentioning 'jq'.",
+      "threshold": "Exit code non-zero and stderr mentions jq installation"
+    },
+    {
+      "id": "C1-05",
+      "category": "functionality",
+      "description": "run.sh discovers and runs all *.bats files under meta-tests/",
+      "testMethod": "command",
+      "testSteps": "Run bash meta-tests/run.sh. Verify it invokes bats with all .bats files found in meta-tests/ (not tests/).",
+      "threshold": "All .bats files under meta-tests/ are discovered"
+    },
+    {
+      "id": "C1-06",
+      "category": "functionality",
+      "description": "run.sh exits with code 0 when bats reports all tests pass",
+      "testMethod": "command",
+      "testSteps": "Ensure at least one .bats file exists with a passing test. Run bash meta-tests/run.sh. Verify exit code is 0.",
+      "threshold": "Exit code 0"
+    },
+    {
+      "id": "C1-07",
+      "category": "functionality",
+      "description": "run.sh supports --filter argument to run a subset of tests by name pattern",
+      "testMethod": "code-inspection",
+      "testSteps": "Read run.sh source. Verify it parses a --filter argument and passes it through to bats (via --filter or grep-based selection).",
+      "threshold": "--filter flag is handled and used to restrict test execution"
+    },
+    {
+      "id": "C1-08",
+      "category": "structure",
+      "description": "test-helper.bash exists at meta-tests/helpers/test-helper.bash and is sourceable by bash",
+      "testMethod": "command",
+      "testSteps": "Run: bash -c 'source meta-tests/helpers/test-helper.bash'. Verify exit code 0 (no syntax errors).",
+      "threshold": "pass/fail"
+    },
+    {
+      "id": "C1-09",
+      "category": "functionality",
+      "description": "test-helper.bash setup() creates an isolated temporary directory and sets TEST_TEMP_DIR",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify setup() calls mktemp -d and exports TEST_TEMP_DIR. Verify it changes to that directory.",
+      "threshold": "setup() creates temp dir and sets TEST_TEMP_DIR"
+    },
+    {
+      "id": "C1-10",
+      "category": "functionality",
+      "description": "test-helper.bash setup() sets HARNESS_STATE env var and creates required subdirectories (sprints/, regression/)",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify setup() exports HARNESS_STATE and runs mkdir -p for sprints/ and regression/ subdirectories.",
+      "threshold": "HARNESS_STATE is set and both subdirectories are created"
+    },
+    {
+      "id": "C1-11",
+      "category": "functionality",
+      "description": "test-helper.bash teardown() removes the temporary directory unconditionally",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify teardown() calls rm -rf on TEST_TEMP_DIR.",
+      "threshold": "teardown() removes TEST_TEMP_DIR"
+    },
+    {
+      "id": "C1-12",
+      "category": "functionality",
+      "description": "test-helper.bash provides init_test_repo() that initializes a git repo with an initial commit and sets user.name/email",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify init_test_repo() calls git init, git config user.email, git config user.name, and makes an initial commit.",
+      "threshold": "Function exists with git init, config, and initial commit"
+    },
+    {
+      "id": "C1-13",
+      "category": "functionality",
+      "description": "test-helper.bash provides source_harness_lib() that sources a harness lib file with correct SCRIPT_DIR so sibling imports resolve",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify source_harness_lib() sets SCRIPT_DIR to the harness/lib directory and sources the requested lib file.",
+      "threshold": "Function sets SCRIPT_DIR and sources harness/lib/<arg>"
+    },
+    {
+      "id": "C1-14",
+      "category": "functionality",
+      "description": "test-helper.bash provides install_fixture() that copies a fixture file from meta-tests/helpers/fixtures/ to a destination, creating parent directories",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify install_fixture() creates parent dirs with mkdir -p and copies from the fixtures directory.",
+      "threshold": "Function creates parent dirs and copies fixture file"
+    },
+    {
+      "id": "C1-15",
+      "category": "functionality",
+      "description": "test-helper.bash provides assert_json_field() that asserts a jq field value with clear error messages on failure",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify assert_json_field(FILE, PATH, EXPECTED) uses jq to read the field and compares to expected value, printing clear error on mismatch.",
+      "threshold": "Function uses jq, compares values, and prints diagnostic on failure"
+    },
+    {
+      "id": "C1-16",
+      "category": "functionality",
+      "description": "test-helper.bash provides run_hook() that runs a hook script with empty stdin and captures exit code",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-helper.bash. Verify run_hook(HOOK_NAME) pipes empty input to the hook script and captures its exit code.",
+      "threshold": "Function exists and handles stdin/exit code"
+    },
+    {
+      "id": "C1-17",
+      "category": "fixtures",
+      "description": "Fixture: config-valid.json exists with all config fields populated (userPrompt, projectType, contextStrategy, model, maxSprintAttempts, maxContractRounds, costCapPerSprint, totalCostCap)",
+      "testMethod": "file-inspection",
+      "testSteps": "Read meta-tests/helpers/fixtures/config-valid.json. Verify valid JSON with all 8 config fields present and non-empty.",
+      "threshold": "All 8 fields present with non-empty values"
+    },
+    {
+      "id": "C1-18",
+      "category": "fixtures",
+      "description": "Fixture: config-minimal.json exists with only required fields (userPrompt, projectType)",
+      "testMethod": "file-inspection",
+      "testSteps": "Read meta-tests/helpers/fixtures/config-minimal.json. Verify valid JSON with userPrompt and projectType fields.",
+      "threshold": "Valid JSON with at least userPrompt and projectType"
+    },
+    {
+      "id": "C1-19",
+      "category": "fixtures",
+      "description": "Fixture: contract-3criteria.json exists with a criteria array containing exactly 3 items with IDs C1-01, C1-02, C1-03",
+      "testMethod": "file-inspection",
+      "testSteps": "Read meta-tests/helpers/fixtures/contract-3criteria.json. Verify .criteria has length 3 and contains IDs C1-01, C1-02, C1-03.",
+      "threshold": "3 criteria with correct IDs"
+    },
+    {
+      "id": "C1-20",
+      "category": "fixtures",
+      "description": "Fixture: contract-empty-criteria.json exists with an empty criteria array",
+      "testMethod": "file-inspection",
+      "testSteps": "Read meta-tests/helpers/fixtures/contract-empty-criteria.json. Verify .criteria is an empty array [].",
+      "threshold": ".criteria == []"
+    },
+    {
+      "id": "C1-21",
+      "category": "fixtures",
+      "description": "Fixtures: handoff-empty.json (no completed sprints) and handoff-with-sprints.json (2 completed sprints) exist with correct structure",
+      "testMethod": "file-inspection",
+      "testSteps": "Read both files. Verify handoff-empty.json has .completedSprints as empty array. Verify handoff-with-sprints.json has .completedSprints with 2 entries.",
+      "threshold": "Both files valid JSON with correct completedSprints"
+    },
+    {
+      "id": "C1-22",
+      "category": "fixtures",
+      "description": "Fixtures: eval-report-pass.json (overallResult=PASS), eval-report-fail.json (overallResult=FAIL with blocking failures), and eval-report-malformed.json (missing required fields) all exist",
+      "testMethod": "file-inspection",
+      "testSteps": "Read all three files. Verify pass has overallResult=PASS, fail has overallResult=FAIL with blockingFailures>0, malformed is missing overallResult or criteriaResults.",
+      "threshold": "All three files exist with correct characteristics"
+    },
+    {
+      "id": "C1-23",
+      "category": "fixtures",
+      "description": "Fixtures: contract-review-accepted.json (decision=accepted), contract-review-revise.json (decision=revise), contract-review-no-decision.json (missing decision field) all exist",
+      "testMethod": "file-inspection",
+      "testSteps": "Read all three files. Verify accepted has .decision=accepted, revise has .decision=revise, no-decision is missing .decision field.",
+      "threshold": "All three files exist with correct structure"
+    },
+    {
+      "id": "C1-24",
+      "category": "fixtures",
+      "description": "Fixture: sprint-plan-3sprint.json exists with a sprints array containing exactly 3 sprint objects each having number and name fields",
+      "testMethod": "file-inspection",
+      "testSteps": "Read meta-tests/helpers/fixtures/sprint-plan-3sprint.json. Verify .sprints has length 3 and each entry has .number and .name.",
+      "threshold": "3 sprints with number and name fields"
+    },
+    {
+      "id": "C1-25",
+      "category": "fixtures",
+      "description": "Fixtures: status-active.json, status-ready-for-eval.json, status-blocked.json, and status-pass.json each contain the correct status value",
+      "testMethod": "file-inspection",
+      "testSteps": "Read each file. Verify status-active.json has .status=active, status-ready-for-eval.json has .status=ready-for-eval, status-blocked.json has .status=blocked, status-pass.json has .status=pass.",
+      "threshold": "All four files exist with correct .status values"
+    },
+    {
+      "id": "C1-26",
+      "category": "fixtures",
+      "description": "Fixtures: registry-empty.json (fresh registry with empty sprints object) and registry-populated.json (registry with criteria from 2 sprints) exist",
+      "testMethod": "file-inspection",
+      "testSteps": "Read both files. Verify registry-empty.json has .sprints as empty object {}. Verify registry-populated.json has .sprints with 2 sprint entries containing criteria arrays.",
+      "threshold": "Both files valid JSON with correct structure"
+    },
+    {
+      "id": "C1-27",
+      "category": "fixtures",
+      "description": "Fixture: generator-log.md exists as a sample generator work log with non-empty markdown content",
+      "testMethod": "file-inspection",
+      "testSteps": "Read meta-tests/helpers/fixtures/generator-log.md. Verify it exists and has non-empty content.",
+      "threshold": "File exists and is non-empty"
+    },
+    {
+      "id": "C1-28",
+      "category": "independence",
+      "description": "meta-tests/ is structurally independent from tests/: it has its own test-helper.bash and does not source or import from the tests/ directory",
+      "testMethod": "code-inspection",
+      "testSteps": "Grep all files under meta-tests/ for references to '../tests/', 'tests/helpers', or 'tests/layer'. Verify zero matches. Verify meta-tests/helpers/test-helper.bash is a separate file, not a symlink.",
+      "threshold": "Zero references to tests/ directory anywhere in meta-tests/"
+    },
+    {
+      "id": "C1-29",
+      "category": "integration",
+      "description": "Running bash meta-tests/run.sh executes successfully (exit 0) with zero or more passing tests and no errors from the infrastructure itself",
+      "testMethod": "command",
+      "testSteps": "Run: bash meta-tests/run.sh 2>&1. Verify exit code 0. Verify output does not contain 'error' or 'syntax error' from bash/bats infrastructure (test failures are fine at this stage, infrastructure errors are not).",
+      "threshold": "Exit code 0, no infrastructure errors"
+    },
+    {
+      "id": "C1-30",
+      "category": "quality",
+      "description": "All fixture JSON files are valid JSON (parseable by jq without errors)",
+      "testMethod": "command",
+      "testSteps": "Run jq '.' on every .json file in meta-tests/helpers/fixtures/. Verify all exit with code 0.",
+      "threshold": "All fixture JSON files parse without errors"
+    }
+  ],
+  "outOfScope": [
+    "Actual test cases for harness functions (Sprint 2-6)",
+    "Pure function tests (Sprint 2: test-utils-pure.bats)",
+    "State management tests (Sprint 3: test-utils-state.bats)",
+    "Git operation tests (Sprint 4: test-git.bats)",
+    "Hook validation tests (Sprint 5: test-hooks.bats)",
+    "Edge case tests (Sprint 6: test-edge-cases.bats)",
+    "CI/CD pipeline integration",
+    "Performance benchmarks",
+    "Any changes to existing harness source code or the existing tests/ directory"
+  ],
+  "regressionSprints": []
+}
