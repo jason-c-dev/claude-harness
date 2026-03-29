@@ -1,5 +1,10 @@
 # Claude Harness
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests: 74/74](https://img.shields.io/badge/tests-74%2F74-brightgreen.svg)](#testing)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-compatible-blue.svg)](https://docs.anthropic.com/en/docs/claude-code)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/jason-c-dev/claude-harness/pulls)
+
 A multi-agent harness for [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) that implements Anthropic's [Planner-Generator-Evaluator architecture](https://www.anthropic.com/engineering/harness-design-long-running-apps) for building software through structured sprint cycles.
 
 Three agents coordinate via files and git branches to produce working software from a brief prompt:
