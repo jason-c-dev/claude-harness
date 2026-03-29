@@ -1,0 +1,28 @@
+{
+  "sprints": [
+    {
+      "number": 1,
+      "name": "Foundation Setup",
+      "theme": "Project initialization",
+      "features": ["Directory structure", "Configuration"],
+      "dependsOn": [],
+      "estimatedComplexity": "low"
+    },
+    {
+      "number": 2,
+      "name": "Core Features",
+      "theme": "Primary functionality",
+      "features": ["Main feature", "Basic API"],
+      "dependsOn": [1],
+      "estimatedComplexity": "medium"
+    },
+    {
+      "number": 3,
+      "name": "Polish and Testing",
+      "theme": "Quality assurance",
+      "features": ["Error handling", "Test coverage"],
+      "dependsOn": [1, 2],
+      "estimatedComplexity": "medium"
+    }
+  ]
+}

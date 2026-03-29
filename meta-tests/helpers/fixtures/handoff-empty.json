@@ -1,0 +1,18 @@
+{
+  "projectName": "",
+  "completedSprints": [],
+  "currentSprint": 1,
+  "totalSprints": 3,
+  "completedFeatures": [],
+  "keyFiles": {},
+  "techStack": {},
+  "outstandingIssues": [],
+  "devServerCommand": "",
+  "devServerPort": 0,
+  "git": {
+    "harnessBranch": "harness/test-project",
+    "latestTag": "",
+    "latestMergeSha": "",
+    "prNumbers": []
+  }
+}

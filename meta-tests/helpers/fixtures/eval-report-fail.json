@@ -1,0 +1,28 @@
+{
+  "sprintNumber": 1,
+  "attempt": 1,
+  "timestamp": "2026-01-15T10:30:00Z",
+  "overallResult": "FAIL",
+  "scores": {
+    "correctness": { "score": 5, "max": 10, "threshold": 7, "pass": false },
+    "quality": { "score": 6, "max": 10, "threshold": 6, "pass": true },
+    "completeness": { "score": 4, "max": 10, "threshold": 7, "pass": false },
+    "robustness": { "score": 3, "max": 10, "threshold": 5, "pass": false }
+  },
+  "criteriaResults": [
+    { "id": "C1-01", "result": "PASS", "evidence": "Project initialized successfully" },
+    { "id": "C1-02", "result": "FAIL", "evidence": "Config missing required database field", "severity": "blocking", "codeLocation": "src/config.js:15", "suggestedFix": "Add database field to default config" },
+    { "id": "C1-03", "result": "FAIL", "evidence": "Help output missing usage section", "severity": "blocking", "codeLocation": "src/cli.js:5", "suggestedFix": "Add usage section to help output" }
+  ],
+  "regression": {
+    "sprintsChecked": [],
+    "criteriaChecked": 0,
+    "pass": 0,
+    "fail": 0,
+    "failures": []
+  },
+  "passCount": 1,
+  "failCount": 2,
+  "blockingFailures": 2,
+  "summary": "2 blocking failures: config missing database field, help missing usage section."
+}
