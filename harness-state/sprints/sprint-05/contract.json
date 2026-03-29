@@ -1,0 +1,361 @@
+{
+  "sprintNumber": 5,
+  "name": "Hook Validation Tests",
+  "theme": "Tests for on-generator-stop.sh, on-evaluator-stop.sh, and on-stop.sh exit codes and error messages",
+  "features": ["F7: Hook Validation Tests (meta-tests/test-hooks.bats)"],
+  "dependsOn": [1],
+  "criteria": [
+    {
+      "id": "C5-01",
+      "category": "file-structure",
+      "description": "meta-tests/test-hooks.bats exists, is a valid bats file, and loads the test helper via 'load helpers/test-helper'",
+      "testMethod": "file-inspection",
+      "testSteps": [
+        "Verify meta-tests/test-hooks.bats exists and is non-empty",
+        "Verify it starts with #!/usr/bin/env bats shebang",
+        "Verify it contains \"load 'helpers/test-helper'\" or equivalent"
+      ],
+      "threshold": "All checks pass"
+    },
+    {
+      "id": "C5-02",
+      "category": "test-execution",
+      "description": "All tests in test-hooks.bats pass when run via 'bats meta-tests/test-hooks.bats'",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bats meta-tests/test-hooks.bats",
+        "Verify exit code is 0",
+        "Verify no tests show as 'not ok'"
+      ],
+      "threshold": "Exit code 0, all tests pass"
+    },
+    {
+      "id": "C5-03",
+      "category": "test-execution",
+      "description": "The full meta-tests suite still passes (no regressions): 'bash meta-tests/run.sh' exits 0",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bash meta-tests/run.sh",
+        "Verify exit code is 0"
+      ],
+      "threshold": "Exit code 0"
+    },
+    {
+      "id": "C5-04",
+      "category": "test-coverage",
+      "description": "test-hooks.bats contains at least 20 @test blocks covering all 3 hook scripts",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Count lines matching '@test ' in test-hooks.bats",
+        "Verify count >= 20"
+      ],
+      "threshold": ">= 20 test blocks"
+    },
+    {
+      "id": "C5-05",
+      "category": "on-generator-stop",
+      "description": "Test: on-generator-stop.sh allows (exit 0) when no active sprint directory exists",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that runs on-generator-stop.sh with no sprint directories under harness-state/sprints/",
+        "Verify the test asserts exit code 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-06",
+      "category": "on-generator-stop",
+      "description": "Test: on-generator-stop.sh allows (exit 0) when status is 'ready-for-eval' and generator-log.md exists",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status-ready-for-eval.json and generator-log.md",
+        "Verify the test asserts on-generator-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-07",
+      "category": "on-generator-stop",
+      "description": "Test: on-generator-stop.sh allows (exit 0) when status is 'blocked'",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status 'blocked'",
+        "Verify the test asserts on-generator-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-08",
+      "category": "on-generator-stop",
+      "description": "Test: on-generator-stop.sh blocks (exit 2) when status is 'active'",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status 'active'",
+        "Verify the test asserts on-generator-stop.sh exits 2",
+        "Verify the test checks stderr contains a message about status not being ready-for-eval"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-09",
+      "category": "on-generator-stop",
+      "description": "Test: on-generator-stop.sh blocks (exit 2) when status is 'ready-for-eval' but generator-log.md is missing",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status 'ready-for-eval' but no generator-log.md file",
+        "Verify the test asserts on-generator-stop.sh exits 2",
+        "Verify the test checks stderr mentions missing generator-log.md"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-10",
+      "category": "on-generator-stop",
+      "description": "Test: on-generator-stop.sh allows (exit 0) during contract negotiation phase (contract-proposal.json exists, contract.json does not)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with contract-proposal.json but no contract.json and no status.json",
+        "Verify the test asserts on-generator-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-11",
+      "category": "on-generator-stop",
+      "description": "Test: on-generator-stop.sh correctly finds sprint in fix-* or refactor-* directories",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a fix-* or refactor-* directory with an active status",
+        "Verify on-generator-stop.sh detects the directory and applies validation (exit 2 for active status)"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-12",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh allows (exit 0) when no sprint is being evaluated (no ready-for-eval status, no contract negotiation)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test runs on-evaluator-stop.sh with no sprint directories or only terminal-status sprints",
+        "Verify the test asserts exit code 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-13",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh allows (exit 0) when eval-report.json exists with valid overallResult and criteriaResults",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status 'ready-for-eval' and installs eval-report-pass.json as eval-report.json",
+        "Verify the test also installs a matching contract.json",
+        "Verify the test asserts on-evaluator-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-14",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh blocks (exit 2) when eval-report.json is missing",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status 'ready-for-eval' but no eval-report.json",
+        "Verify the test asserts on-evaluator-stop.sh exits 2",
+        "Verify stderr mentions missing eval-report.json"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-15",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh blocks (exit 2) when overallResult field is missing from eval-report.json",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status 'ready-for-eval' and an eval-report.json missing overallResult (e.g. eval-report-malformed.json)",
+        "Verify the test asserts on-evaluator-stop.sh exits 2",
+        "Verify stderr mentions missing overallResult"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-16",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh blocks (exit 2) when criteriaResults field is missing from eval-report.json",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with status 'ready-for-eval' and an eval-report.json missing criteriaResults",
+        "Verify the test asserts on-evaluator-stop.sh exits 2"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-17",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh blocks (exit 2) when criteria count in eval report is less than contract criteria count",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint with contract-3criteria.json (3 criteria) and an eval report with only 1-2 criteriaResults",
+        "Verify the test asserts on-evaluator-stop.sh exits 2",
+        "Verify stderr mentions the criteria count mismatch"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-18",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh allows (exit 0) when criteria count in eval report >= contract criteria count",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint with contract-3criteria.json and eval-report-pass.json (3 criteriaResults)",
+        "Verify the test asserts on-evaluator-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-19",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh allows (exit 0) for valid contract review with decision field present",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with contract-proposal.json and contract-review-accepted.json (has decision field) but no contract.json",
+        "Verify the test asserts on-evaluator-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-20",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh blocks (exit 2) during contract review when contract-review.json is missing",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint directory with contract-proposal.json but no contract.json and no contract-review.json",
+        "Verify the test asserts on-evaluator-stop.sh exits 2",
+        "Verify stderr mentions missing contract-review.json"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-21",
+      "category": "on-evaluator-stop",
+      "description": "Test: on-evaluator-stop.sh blocks (exit 2) during contract review when decision field is missing from contract-review.json",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a sprint with contract-proposal.json and contract-review-no-decision.json (missing decision field) but no contract.json",
+        "Verify the test asserts on-evaluator-stop.sh exits 2",
+        "Verify stderr mentions missing decision field"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-22",
+      "category": "on-stop",
+      "description": "Test: on-stop.sh allows (exit 0) when no sprint-plan.json exists (not a harness session)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test runs on-stop.sh with no sprint-plan.json in harness-state/",
+        "Verify the test asserts exit code 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-23",
+      "category": "on-stop",
+      "description": "Test: on-stop.sh allows (exit 0) when all sprints have terminal status (pass or fail)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates sprint-plan.json and sprint directories with status 'pass'",
+        "Verify the test asserts on-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-24",
+      "category": "on-stop",
+      "description": "Test: on-stop.sh blocks (exit 2) when any sprint has status 'active'",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates sprint-plan.json and a sprint directory with status 'active'",
+        "Verify the test asserts on-stop.sh exits 2",
+        "Verify stderr mentions the sprint is still active"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-25",
+      "category": "on-stop",
+      "description": "Test: on-stop.sh blocks (exit 2) when any sprint has status 'negotiating'",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates sprint-plan.json and a sprint directory with status 'negotiating'",
+        "Verify the test asserts on-stop.sh exits 2"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-26",
+      "category": "on-stop",
+      "description": "Test: on-stop.sh blocks (exit 2) when any sprint has status 'ready-for-eval'",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates sprint-plan.json and a sprint directory with status 'ready-for-eval'",
+        "Verify the test asserts on-stop.sh exits 2",
+        "Verify stderr mentions the sprint is ready for evaluation"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-27",
+      "category": "on-stop",
+      "description": "Test: on-stop.sh allows (exit 0) when sprint directories exist but have no status.json files",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates sprint-plan.json and sprint directories with no status.json inside them",
+        "Verify the test asserts on-stop.sh exits 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C5-28",
+      "category": "test-isolation",
+      "description": "Every @test in test-hooks.bats works in the test temp directory with HARNESS_STATE set -- no test modifies the real harness-state/",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Verify tests use install_fixture or create files in the temp directory (via $HARNESS_STATE or $TEST_TEMP_DIR)",
+        "Verify no test writes to the project's actual harness-state/ directory",
+        "Verify hooks are executed with the working directory set to the temp dir so they read from the temp harness-state/"
+      ],
+      "threshold": "All tests are isolated"
+    },
+    {
+      "id": "C5-29",
+      "category": "test-quality",
+      "description": "Test names follow the 'hook_name: behavior description' convention (e.g., 'on-generator-stop: allows when status is blocked')",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Inspect all @test names in test-hooks.bats",
+        "Verify each follows 'on-generator-stop:', 'on-evaluator-stop:', or 'on-stop:' prefix with descriptive behavior"
+      ],
+      "threshold": "All test names follow the convention"
+    },
+    {
+      "id": "C5-30",
+      "category": "test-quality",
+      "description": "Tests that assert exit code 2 (block) also verify a meaningful error message is present in stderr output",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Inspect all @test blocks that assert exit code 2",
+        "Verify each also checks the output (stderr captured via run_hook or equivalent) contains a relevant substring"
+      ],
+      "threshold": "All blocking tests verify error messages"
+    }
+  ],
+  "outOfScope": [
+    "Tests for functions in utils.sh (covered in sprints 2 and 3)",
+    "Tests for functions in git.sh (covered in sprint 4)",
+    "Edge case tests beyond the core validation paths documented in the hook scripts (covered in sprint 6)",
+    "Testing the git commit convention warning in on-generator-stop.sh (non-blocking, warning only)",
+    "Modifying the test helper or existing fixtures -- use existing infrastructure from sprint 1",
+    "Testing hooks with real Claude invocations or network calls"
+  ],
+  "regressionSprints": [1, 2, 3, 4]
+}

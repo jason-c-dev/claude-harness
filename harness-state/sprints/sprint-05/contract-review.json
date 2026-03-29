@@ -1,0 +1,89 @@
+{
+  "decision": "accepted",
+  "reviewedAt": "2026-03-28T00:00:00Z",
+  "feedback": "Strong contract. All 30 criteria are testable, specific, and map accurately to the actual hook source code. Cross-referenced every criterion against on-generator-stop.sh, on-evaluator-stop.sh, and on-stop.sh line by line — no validation paths are missed.",
+  "criteriaAnalysis": {
+    "totalCriteria": 30,
+    "categories": {
+      "file-structure": 1,
+      "test-execution": 2,
+      "test-coverage": 1,
+      "on-generator-stop": 7,
+      "on-evaluator-stop": 10,
+      "on-stop": 6,
+      "test-isolation": 1,
+      "test-quality": 2
+    },
+    "hookCoverage": {
+      "on-generator-stop.sh": {
+        "validationPaths": [
+          "No active sprint → exit 0 (C5-05)",
+          "status=ready-for-eval + generator-log.md → exit 0 (C5-06)",
+          "status=blocked → exit 0 (C5-07)",
+          "status=active → exit 2 (C5-08)",
+          "status=ready-for-eval but no generator-log.md → exit 2 (C5-09)",
+          "Contract negotiation phase → exit 0 (C5-10)",
+          "fix-*/refactor-* directories → validated (C5-11)"
+        ],
+        "assessment": "Complete. All branches in lines 15-63 of the hook are covered."
+      },
+      "on-evaluator-stop.sh": {
+        "validationPaths": [
+          "No eval sprint and no contract review → exit 0 (C5-12)",
+          "Valid eval report → exit 0 (C5-13)",
+          "Missing eval-report.json → exit 2 (C5-14)",
+          "Missing overallResult → exit 2 (C5-15)",
+          "Missing criteriaResults → exit 2 (C5-16)",
+          "Criteria count mismatch (fewer in report) → exit 2 (C5-17)",
+          "Criteria count match → exit 0 (C5-18)",
+          "Valid contract review with decision → exit 0 (C5-19)",
+          "Missing contract-review.json → exit 2 (C5-20)",
+          "Missing decision field → exit 2 (C5-21)"
+        ],
+        "assessment": "Complete. All branches in lines 12-75 of the hook are covered."
+      },
+      "on-stop.sh": {
+        "validationPaths": [
+          "No sprint-plan.json → exit 0 (C5-22)",
+          "All terminal statuses → exit 0 (C5-23)",
+          "status=active → exit 2 (C5-24)",
+          "status=negotiating → exit 2 (C5-25)",
+          "status=ready-for-eval → exit 2 (C5-26)",
+          "No status.json in sprint dirs → exit 0 (C5-27)"
+        ],
+        "assessment": "Complete. All branches in lines 11-34 of the hook are covered."
+      }
+    }
+  },
+  "fixtureAvailability": {
+    "status": "All referenced fixtures exist from sprint 1",
+    "available": [
+      "status-active.json",
+      "status-ready-for-eval.json",
+      "status-blocked.json",
+      "status-pass.json",
+      "eval-report-pass.json",
+      "eval-report-malformed.json",
+      "contract-3criteria.json",
+      "contract-review-accepted.json",
+      "contract-review-no-decision.json",
+      "generator-log.md"
+    ],
+    "note": "C5-16 (missing criteriaResults only) will need a custom fixture or inline JSON — eval-report-malformed.json is missing both overallResult AND criteriaResults. The generator should create a separate fixture (e.g. eval-report-no-criteria.json) or construct the JSON in the test. This is an implementation detail, not a contract flaw."
+  },
+  "implementationNotes": [
+    "run_hook() in test-helper.bash merges stderr into stdout (2>&1). Tests checking error messages (C5-08, C5-09, C5-14, C5-15, C5-16, C5-17, C5-20, C5-21, C5-24, C5-26, C5-30) will need to either (a) use bats 'run' directly with stderr separation, or (b) accept that 'output' contains the merged stream. The criteria say 'stderr captured via run_hook or equivalent' which gives sufficient flexibility.",
+    "Hooks hardcode HARNESS_STATE='harness-state' relative to cwd. Test isolation (C5-28) works because the test helper cd's to TEST_TEMP_DIR in setup(). The generator must ensure all hook invocations happen from within the temp dir.",
+    "The on-evaluator-stop.sh contract review loop (line 27) only searches sprint-* directories, not fix-*/refactor-*. Criteria C5-19-21 don't specify fix-*/refactor-* for contract review, which correctly matches the actual hook behavior."
+  ],
+  "regressionCheck": {
+    "listed": [1, 2, 3, 4],
+    "expected": [1, 2, 3, 4],
+    "assessment": "Correct — all completed sprints are listed."
+  },
+  "outOfScopeCheck": {
+    "assessment": "Appropriate. Excludes utils.sh tests (sprints 2-3), git.sh tests (sprint 4), edge cases beyond core paths (sprint 6), the non-blocking git commit warning in on-generator-stop.sh, and test infrastructure modifications. No important scope is missing."
+  },
+  "missingCriteria": [],
+  "unclearCriteria": []
+}
