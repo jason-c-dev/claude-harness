@@ -104,7 +104,7 @@ git_commit_harness_state() {
   git add "${HARNESS_STATE}/" 2>/dev/null || true
   git add -u "${HARNESS_STATE}/" 2>/dev/null || true
 
-  if git diff --cached --quiet; then
+  if git diff --cached --quiet 2>/dev/null; then
     log_info "No harness-state changes to commit"
     return
   fi

@@ -201,6 +201,17 @@ run_new_build() {
   log_info "Model: ${MODEL}"
   log_info "Context strategy: ${CONTEXT_STRATEGY}"
 
+  # Ensure we're in a git repo (auto-init for new projects)
+  if ! git rev-parse --git-dir &>/dev/null; then
+    log_info "No git repo found. Initializing..."
+    git init -q -b main
+    git config user.email "${GIT_EMAIL:-harness@claude-harness.dev}"
+    git config user.name "${GIT_NAME:-Claude Harness}"
+    echo "# ${project_slug}" > README.md
+    git add README.md
+    git commit -q -m "initial commit"
+  fi
+
   # Initialize state
   init_harness_state "$USER_PROMPT" "$PROJECT_TYPE"
 
