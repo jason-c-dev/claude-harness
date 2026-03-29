@@ -50,14 +50,15 @@ if [[ ! -f "${EVAL_SPRINT}/eval-report.json" ]]; then
   exit 2
 fi
 
-# Validate eval report structure
-if ! jq -e '.overallResult' "${EVAL_SPRINT}/eval-report.json" &>/dev/null; then
-  echo "eval-report.json is missing 'overallResult' field (must be 'PASS' or 'FAIL')." >&2
+# Validate eval report structure (tolerate field name variations)
+if ! jq -e '.overallResult // .result // .verdict' "${EVAL_SPRINT}/eval-report.json" &>/dev/null; then
+  echo "eval-report.json is missing result field (overallResult, result, or verdict)." >&2
   exit 2
 fi
 
-if ! jq -e '.criteriaResults' "${EVAL_SPRINT}/eval-report.json" &>/dev/null; then
-  echo "eval-report.json is missing 'criteriaResults' array." >&2
+# criteriaResults may be named differently or structured as nested features
+if ! jq -e '.criteriaResults // .features // .score // .results' "${EVAL_SPRINT}/eval-report.json" &>/dev/null; then
+  echo "eval-report.json is missing results data." >&2
   exit 2
 fi
 

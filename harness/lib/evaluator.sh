@@ -36,15 +36,15 @@ invoke_evaluator() {
     return 1
   fi
 
-  # Tolerate both .overallResult and .result (real Claude may use either)
+  # Tolerate many field name variations and case differences from real Claude
   local result
-  result=$(jq -r '.overallResult // .result // "UNKNOWN"' "${dir}/eval-report.json" 2>/dev/null)
+  result=$(jq -r '(.overallResult // .result // .verdict // "UNKNOWN") | ascii_downcase' "${dir}/eval-report.json" 2>/dev/null)
   local pass_count fail_count blocking
-  pass_count=$(jq -r '.passCount // .pass_count // 0' "${dir}/eval-report.json" 2>/dev/null)
-  fail_count=$(jq -r '.failCount // .fail_count // 0' "${dir}/eval-report.json" 2>/dev/null)
-  blocking=$(jq -r '.blockingFailures // .blocking_failures // 0' "${dir}/eval-report.json" 2>/dev/null)
+  pass_count=$(jq -r '.passCount // .pass_count // .score.passedCriteria // .score.passed // 0' "${dir}/eval-report.json" 2>/dev/null)
+  fail_count=$(jq -r '.failCount // .fail_count // .score.failedCriteria // .score.failed // 0' "${dir}/eval-report.json" 2>/dev/null)
+  blocking=$(jq -r '.blockingFailures // .blocking_failures // .score.blocking // 0' "${dir}/eval-report.json" 2>/dev/null)
 
-  if [[ "$result" == "PASS" ]]; then
+  if [[ "$result" == "pass" || "$result" == "passed" ]]; then
     log_success "Sprint $(sprint_pad "$sprint_num") PASSED (${pass_count} pass, ${fail_count} fail, ${blocking} blocking)"
     return 0
   else

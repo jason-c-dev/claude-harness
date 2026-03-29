@@ -39,7 +39,13 @@ negotiate_contract() {
     fi
 
     local criteria_count
-    criteria_count=$(jq '.criteria | length' "${dir}/contract-proposal.json" 2>/dev/null || echo "0")
+    # Tolerate different structures: .criteria[], .features[].acceptanceCriteria[], or flat .acceptanceCriteria[]
+    criteria_count=$(jq '
+      if .criteria then (.criteria | length)
+      elif .features then [.features[].acceptanceCriteria // .features[].criteria // [] | length] | add // 0
+      elif .acceptanceCriteria then (.acceptanceCriteria | length)
+      else 0 end
+    ' "${dir}/contract-proposal.json" 2>/dev/null || echo "0")
     log_info "Proposal: ${criteria_count} criteria"
 
     # Evaluator reviews
@@ -55,17 +61,20 @@ negotiate_contract() {
       return 1
     fi
 
+    # Tolerate: .decision, .reviewVerdict, .verdict — and "accepted", "accept", "approved"
     local decision
-    decision=$(json_read "${dir}/contract-review.json" ".decision")
+    decision=$(jq -r '(.decision // .reviewVerdict // .verdict // "unknown") | ascii_downcase' "${dir}/contract-review.json" 2>/dev/null)
 
-    if [[ "$decision" == "accepted" ]]; then
+    if [[ "$decision" == "accepted" || "$decision" == "accept" || "$decision" == "approved" || "$decision" == "approve" ]]; then
       # Copy proposal to contract
       cp "${dir}/contract-proposal.json" "${dir}/contract.json"
       log_success "Contract agreed (round ${round}, ${criteria_count} criteria)"
       return 0
     fi
 
-    log_warn "Evaluator requested revisions: $(json_read "${dir}/contract-review.json" ".feedback" | head -c 200)"
+    local feedback
+    feedback=$(jq -r '.feedback // .verdictReason // .reason // .comments // "no feedback provided"' "${dir}/contract-review.json" 2>/dev/null)
+    log_warn "Evaluator requested revisions: $(echo "$feedback" | head -c 200)"
   done
 
   # Max rounds reached -- accept the latest proposal

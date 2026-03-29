@@ -125,7 +125,7 @@ run_sprint() {
   dir=$(sprint_dir "$sprint_num")
 
   local sprint_name
-  sprint_name=$(json_read "${HARNESS_STATE}/sprint-plan.json" ".sprints[$(( sprint_num - 1 ))].name")
+  sprint_name=$(jq -r ".sprints[$(( sprint_num - 1 ))] | .name // .title // \"Sprint ${sprint_num}\"" "${HARNESS_STATE}/sprint-plan.json" 2>/dev/null)
 
   log_phase "SPRINT $(sprint_pad "$sprint_num"): ${sprint_name}"
 

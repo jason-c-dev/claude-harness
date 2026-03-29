@@ -152,7 +152,7 @@ update_progress() {
   local merge_sha="${4:-}"
 
   local sprint_name
-  sprint_name=$(json_read "${HARNESS_STATE}/sprint-plan.json" ".sprints[$(( sprint_num - 1 ))].name")
+  sprint_name=$(jq -r ".sprints[$(( sprint_num - 1 ))] | .name // .title // \"Sprint ${sprint_num}\"" "${HARNESS_STATE}/sprint-plan.json" 2>/dev/null)
 
   cat >> "${HARNESS_STATE}/progress.md" <<EOF
 
