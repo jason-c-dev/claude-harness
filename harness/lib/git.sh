@@ -72,7 +72,7 @@ git_merge_sprint() {
   log_success "Tagged: ${tag}"
 
   # Delete the sprint branch (merged)
-  git branch -d "$sprint_branch"
+  git branch -d "$sprint_branch" >&2
 
   echo "$merge_sha"
 }

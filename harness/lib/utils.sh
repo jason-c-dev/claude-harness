@@ -171,6 +171,7 @@ update_handoff() {
   local sprint_num="$1"
   local merge_sha="${2:-}"
   local tag="${3:-}"
+  local harness_branch="${4:-}"
 
   local handoff_file="${HARNESS_STATE}/handoff.json"
 
@@ -205,12 +206,14 @@ EOF
     --argjson sprint "$sprint_num" \
     --arg tag "$tag" \
     --arg sha "$merge_sha" \
+    --arg branch "$harness_branch" \
     '
     .completedSprints += [$sprint] |
     .completedSprints |= unique |
     .currentSprint = ($sprint + 1) |
     .git.latestTag = $tag |
-    .git.latestMergeSha = $sha
+    .git.latestMergeSha = $sha |
+    (if $branch != "" then .git.harnessBranch = $branch else . end)
     ' "$handoff_file" > "$tmp" && mv "$tmp" "$handoff_file"
 }
 

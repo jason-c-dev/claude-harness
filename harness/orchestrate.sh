@@ -168,7 +168,7 @@ run_sprint() {
       merge_sha=$(git_merge_sprint "$harness_branch" "$sprint_num" "$attempt")
       local tag="harness/sprint-$(sprint_pad "$sprint_num")/pass"
 
-      update_handoff "$sprint_num" "$merge_sha" "$tag"
+      update_handoff "$sprint_num" "$merge_sha" "$tag" "$harness_branch"
       update_progress "$sprint_num" "PASS" "$attempt" "$merge_sha"
       update_regression_registry "$sprint_num"
       git_commit_harness_state "harness(eval): sprint-$(sprint_pad "$sprint_num") PASS"
@@ -208,11 +208,27 @@ run_new_build() {
   local harness_branch
   harness_branch=$(git_create_harness_branch "$project_slug")
 
-  # Update handoff with git info
-  local tmp
-  tmp=$(mktemp)
-  jq --arg branch "$harness_branch" '.git.harnessBranch = $branch' \
-    "${HARNESS_STATE}/handoff.json" > "$tmp" 2>/dev/null && mv "$tmp" "${HARNESS_STATE}/handoff.json" || true
+  # Initialize handoff.json with harness branch
+  cat > "${HARNESS_STATE}/handoff.json" <<EOF
+{
+  "projectName": "",
+  "completedSprints": [],
+  "currentSprint": 1,
+  "totalSprints": 0,
+  "completedFeatures": [],
+  "keyFiles": {},
+  "techStack": {},
+  "outstandingIssues": [],
+  "devServerCommand": "",
+  "devServerPort": 0,
+  "git": {
+    "harnessBranch": "${harness_branch}",
+    "latestTag": "",
+    "latestMergeSha": "",
+    "prNumbers": []
+  }
+}
+EOF
 
   git_commit_harness_state "harness: initialize state for ${project_slug}"
 
