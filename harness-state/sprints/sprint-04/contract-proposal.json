@@ -1,0 +1,328 @@
+{
+  "sprintNumber": 4,
+  "name": "Git Operation Tests",
+  "theme": "Tests for all git.sh functions using isolated temporary git repositories",
+  "features": ["F6: Git Operation Tests (meta-tests/test-git.bats)"],
+  "dependsOn": [1],
+  "criteria": [
+    {
+      "id": "C4-01",
+      "category": "file-structure",
+      "description": "meta-tests/test-git.bats exists, is a valid bats file, and loads the test helper via 'load helpers/test-helper'",
+      "testMethod": "file-inspection",
+      "testSteps": [
+        "Verify meta-tests/test-git.bats exists and is non-empty",
+        "Verify it starts with #!/usr/bin/env bats shebang",
+        "Verify it contains \"load 'helpers/test-helper'\" or equivalent"
+      ],
+      "threshold": "All checks pass"
+    },
+    {
+      "id": "C4-02",
+      "category": "test-execution",
+      "description": "All tests in test-git.bats pass when run via 'bats meta-tests/test-git.bats'",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bats meta-tests/test-git.bats",
+        "Verify exit code is 0",
+        "Verify no tests show as 'not ok'"
+      ],
+      "threshold": "Exit code 0, all tests pass"
+    },
+    {
+      "id": "C4-03",
+      "category": "test-execution",
+      "description": "The full meta-tests suite still passes (no regressions): 'bash meta-tests/run.sh' exits 0",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bash meta-tests/run.sh",
+        "Verify exit code is 0"
+      ],
+      "threshold": "Exit code 0"
+    },
+    {
+      "id": "C4-04",
+      "category": "test-coverage",
+      "description": "test-git.bats contains at least 20 @test blocks covering all 6 git.sh functions",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Count lines matching '@test ' in test-git.bats",
+        "Verify count >= 20"
+      ],
+      "threshold": ">= 20 test blocks"
+    },
+    {
+      "id": "C4-05",
+      "category": "git_create_harness_branch",
+      "description": "Test: git_create_harness_branch creates a 'harness/{slug}' branch from main",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that calls git_create_harness_branch with a slug argument",
+        "Verify it asserts the branch 'harness/{slug}' exists after the call",
+        "Run the test and verify it passes"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-06",
+      "category": "git_create_harness_branch",
+      "description": "Test: git_create_harness_branch returns branch name on stdout",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that captures the output of git_create_harness_branch",
+        "Verify the test asserts the returned string matches 'harness/{slug}'"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-07",
+      "category": "git_create_harness_branch",
+      "description": "Test: git_create_harness_branch is idempotent -- re-running checks out existing branch without error",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that calls git_create_harness_branch twice with the same slug",
+        "Verify the test asserts the second call succeeds (exit 0) and the repo is on the correct branch"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-08",
+      "category": "git_create_sprint_branch",
+      "description": "Test: git_create_sprint_branch creates '{harness-branch}-sprint-NN' with zero-padded sprint number",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that calls git_create_sprint_branch with a harness branch and sprint number",
+        "Verify it asserts the branch name includes the zero-padded sprint number (e.g., sprint-03)"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-09",
+      "category": "git_create_sprint_branch",
+      "description": "Test: git_create_sprint_branch returns branch name on stdout and leaves repo on sprint branch",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test checks the return value of git_create_sprint_branch",
+        "Verify it also asserts the current branch is the sprint branch after the call"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-10",
+      "category": "git_create_sprint_branch",
+      "description": "Test: git_create_sprint_branch deletes stale sprint branch from prior failed attempt before recreating",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that pre-creates a sprint branch, then calls git_create_sprint_branch",
+        "Verify the test asserts the old branch is replaced (not duplicated) and the new branch is on the harness branch's HEAD"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-11",
+      "category": "git_merge_sprint",
+      "description": "Test: git_merge_sprint performs a --no-ff merge of the sprint branch into the harness branch",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test sets up a harness branch and sprint branch with at least one commit, then calls git_merge_sprint",
+        "Verify it asserts the current branch is the harness branch after merge",
+        "Verify the merge commit exists (git log shows the merge message)"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-12",
+      "category": "git_merge_sprint",
+      "description": "Test: git_merge_sprint creates annotated tag 'harness/sprint-NN/pass'",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls git_merge_sprint and then checks that the tag 'harness/sprint-NN/pass' exists",
+        "Verify the tag points to the merge commit"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-13",
+      "category": "git_merge_sprint",
+      "description": "Test: git_merge_sprint deletes the sprint branch after merging",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls git_merge_sprint and then verifies the sprint branch no longer exists",
+        "Verify with: git rev-parse --verify {sprint-branch} should fail"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-14",
+      "category": "git_merge_sprint",
+      "description": "Test: git_merge_sprint returns the merge SHA on stdout",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test captures the output of git_merge_sprint",
+        "Verify the returned SHA matches HEAD on the harness branch after merge"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-15",
+      "category": "git_merge_sprint",
+      "description": "Test: git_merge_sprint commits any uncommitted changes on the sprint branch before merging",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates uncommitted changes (e.g., writes to a file) on the sprint branch before calling git_merge_sprint",
+        "Verify the uncommitted changes are present in the harness branch after merge"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-16",
+      "category": "git_fail_sprint_attempt",
+      "description": "Test: git_fail_sprint_attempt creates a tag 'harness/sprint-NN/attempt-N'",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test sets up a sprint branch, calls git_fail_sprint_attempt, and then checks the tag exists"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-17",
+      "category": "git_fail_sprint_attempt",
+      "description": "Test: git_fail_sprint_attempt returns to the harness branch and deletes the sprint branch",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls git_fail_sprint_attempt and then asserts the current branch is the harness branch",
+        "Verify the sprint branch no longer exists after the call"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-18",
+      "category": "git_fail_sprint_attempt",
+      "description": "Test: git_fail_sprint_attempt handles uncommitted changes via stash (does not fail with dirty working tree)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates uncommitted changes on the sprint branch before calling git_fail_sprint_attempt",
+        "Verify the function completes without error (exit 0)",
+        "Verify the working directory is clean after returning to harness branch"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-19",
+      "category": "git_commit_harness_state",
+      "description": "Test: git_commit_harness_state commits harness-state directory changes with the given message",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test modifies a file in harness-state/, calls git_commit_harness_state with a message",
+        "Verify git log shows a new commit with the expected message"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-20",
+      "category": "git_commit_harness_state",
+      "description": "Test: git_commit_harness_state is a no-op when nothing has changed in harness-state/",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls git_commit_harness_state with no pending changes",
+        "Verify no new commit is created (git log HEAD count unchanged)"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-21",
+      "category": "git_commit_harness_state",
+      "description": "Test: git_commit_harness_state handles both tracked modifications and untracked new files in harness-state/",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test adds a new (untracked) file AND modifies an existing file in harness-state/",
+        "Verify both changes appear in the commit after calling git_commit_harness_state"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-22",
+      "category": "generate_pr_body",
+      "description": "Test: generate_pr_body produces markdown containing a sprint results table with correct column headers",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls generate_pr_body with fixtures installed (config.json, sprint-plan.json)",
+        "Verify the output contains '| Sprint | Name | Status | Criteria | Pass | Fail | Attempts | Cost |'"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-23",
+      "category": "generate_pr_body",
+      "description": "Test: generate_pr_body includes PASS/FAIL status from eval reports when they exist",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test installs an eval-report-pass.json fixture for a sprint",
+        "Verify the output of generate_pr_body includes 'PASS' in the row for that sprint"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-24",
+      "category": "generate_pr_body",
+      "description": "Test: generate_pr_body shows 'pending' status for sprints without eval reports",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test sets up a sprint-plan with multiple sprints but only provides eval reports for some",
+        "Verify sprints without eval reports show 'pending' in their row"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-25",
+      "category": "generate_pr_body",
+      "description": "Test: generate_pr_body includes configuration summary (model, context strategy, project type)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls generate_pr_body and checks the output includes the model, context strategy, and project type from config.json"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C4-26",
+      "category": "test-isolation",
+      "description": "Every @test in test-git.bats uses init_test_repo or equivalent git init to ensure test isolation -- no test depends on another test's git state",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Verify the setup() function or each @test calls init_test_repo (or git init)",
+        "Verify no @test references branches or tags that would only exist if another test ran first"
+      ],
+      "threshold": "All tests are isolated"
+    },
+    {
+      "id": "C4-27",
+      "category": "test-quality",
+      "description": "Test names follow the pattern 'function_name: behavior description' (e.g., 'git_create_harness_branch: creates branch from main')",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Inspect all @test names in test-git.bats",
+        "Verify each follows 'function_name: descriptive behavior' convention"
+      ],
+      "threshold": "All test names follow the convention"
+    },
+    {
+      "id": "C4-28",
+      "category": "test-quality",
+      "description": "Tests source the git.sh library via source_harness_lib 'git.sh' (not direct source path)",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Verify test-git.bats calls source_harness_lib 'git.sh' in setup() or at file level",
+        "Verify no hardcoded paths to harness/lib/git.sh"
+      ],
+      "threshold": "Uses source_harness_lib helper"
+    }
+  ],
+  "outOfScope": [
+    "git_create_pr and git_create_issue functions (these require the gh CLI and network access; they are out of scope for this pure-git test suite)",
+    "Tests for functions in utils.sh (covered in sprints 2 and 3)",
+    "Hook validation tests (covered in sprint 5)",
+    "Edge case tests beyond the core behaviors (covered in sprint 6)",
+    "Modifying the test helper or fixtures (use existing infrastructure from sprint 1)"
+  ],
+  "regressionSprints": [1, 2, 3]
+}
