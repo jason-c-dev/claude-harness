@@ -2,9 +2,10 @@
   "projectName": "",
   "completedSprints": [
     1,
-    2
+    2,
+    3
   ],
-  "currentSprint": 3,
+  "currentSprint": 4,
   "totalSprints": 0,
   "completedFeatures": [],
   "keyFiles": {},
@@ -14,8 +15,8 @@
   "devServerPort": 0,
   "git": {
     "harnessBranch": "",
-    "latestTag": "harness/sprint-02/pass",
-    "latestMergeSha": "Deleted branch harness/build-a-comprehensive-bats-core-test-suite-for-thi-sprint-02 (was 615f287).\n45ec4adad51d51cc9106f1045ec29a5a6705e88f",
+    "latestTag": "harness/sprint-03/pass",
+    "latestMergeSha": "Deleted branch harness/build-a-comprehensive-bats-core-test-suite-for-thi-sprint-03 (was 2554014).\nc4003bfda0c51b37555384018ed6c146d7633de0",
     "prNumbers": []
   }
 }
