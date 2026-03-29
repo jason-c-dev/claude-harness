@@ -20,6 +20,11 @@ invoke_evaluator() {
 
   local prompt="Evaluate sprint ${sprint_num}. Read the contract at harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/contract.json. Read harness-state/handoff.json for git branch info and dev server details. Use git diff to understand what changed. Start the dev server, test every criterion, run regression tests if the contract specifies regressionSprints, score the holistic dimensions for project type '${project_type}'. Write your report to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/eval-report.json and update status.json."
 
+  # Inject design spec verification for web-frontend
+  if [[ "$project_type" == "web-frontend" ]] && file_exists "${HARNESS_STATE}/design-spec.md"; then
+    prompt="${prompt} IMPORTANT: Read harness-state/design-spec.md and verify the implementation matches the design system. Design Quality and Originality scores are BLOCKING -- FAIL the sprint if Design Quality < 6 or Originality < 5."
+  fi
+
   local mcp_flag=""
   if [[ "$project_type" == "web-frontend" ]] && [[ -f ".mcp.json" ]]; then
     mcp_flag="--mcp-config .mcp.json"

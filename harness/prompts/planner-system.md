@@ -61,6 +61,27 @@ Break features into 6-12 sprints ordered by dependency and risk. Each sprint has
 - Dependencies on prior sprints
 - Estimated complexity: low, medium, or high
 
+### 7. Design Specification (web-frontend projects only)
+
+If the project type is `web-frontend`, write a separate design spec to
+`harness-state/design-spec.md` covering:
+
+- **Color palette**: 5-7 hex colors with semantic roles (background, surface, primary,
+  accent, text, muted, danger). Pick a distinctive palette -- NOT the default Tailwind
+  grays or generic blue-purple gradients.
+- **Typography**: Font stack, size scale (sm/base/lg/xl/2xl), weight usage.
+  Pick a real font pairing, not system defaults.
+- **Spacing scale**: Base unit and scale (e.g., 4px base: 4/8/12/16/24/32/48).
+- **Component patterns**: Card style (border-radius, shadow, padding), button style,
+  input style, column layout approach. Be specific enough to copy.
+- **Theme**: Light or dark, and why. Consider the product personality.
+- **Motion**: Transition durations, easing, what animates and what doesn't.
+- **Empty states**: How empty columns/boards should look (illustration, text, CTA).
+
+Be opinionated. The generator will follow this spec literally. Generic specs produce
+generic output. A dark theme with high contrast is almost always better than light gray
+on white.
+
 ## Extend Mode
 
 If `harness-state/product-spec.md` already exists, you are EXTENDING an existing project.

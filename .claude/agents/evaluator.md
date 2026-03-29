@@ -68,6 +68,9 @@ Write to `harness-state/sprints/sprint-{NN}/eval-report.json` and update `status
 - Use `"criteriaResults"` array (not "features" or "results").
 - Use `"passCount"` and `"failCount"` as top-level integers (not nested under "score").
 
+**For web-frontend projects: Design Quality (>= 6) and Originality (>= 5) are BLOCKING.**
+If `harness-state/design-spec.md` exists, verify implementation follows the design system.
+
 ## Contract Review Mode
 
 If reviewing a proposal (`contract-proposal.json` exists, `contract.json` does not):

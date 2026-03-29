@@ -69,6 +69,13 @@ Break features into 6-12 sprints ordered by dependency and risk. Each sprint has
 - Dependencies on prior sprints
 - Estimated complexity: low, medium, or high
 
+### 7. Design Specification (web-frontend only)
+
+If projectType is `web-frontend`, also write `harness-state/design-spec.md` with:
+color palette (5-7 hex codes with roles), typography (font stack + scale), spacing scale,
+component patterns (card, button, input styles), theme (light/dark + why), motion, empty states.
+Be opinionated -- generic specs produce generic output.
+
 ## Extend Mode
 
 If `harness-state/product-spec.md` already exists, you are EXTENDING an existing project.

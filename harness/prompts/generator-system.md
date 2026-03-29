@@ -71,7 +71,11 @@ Once the contract is agreed (`contract.json` exists), build the sprint:
 
 1. Read the contract criteria carefully. Understand every criterion.
 2. Read `handoff.json` for the current state of the codebase.
-3. Implement incrementally, committing after each meaningful unit of work.
+3. **If `harness-state/design-spec.md` exists, read it before writing any UI code.
+   Follow the color palette, typography, spacing, and component patterns exactly.
+   Do not deviate to defaults or library presets. The design spec is as binding
+   as the contract criteria.**
+4. Implement incrementally, committing after each meaningful unit of work.
 4. Use the commit convention: `harness(sprint-NN): description [C-ID]`
 5. Self-test your work against each criterion before declaring done.
 6. Start the dev server and verify the application actually runs.

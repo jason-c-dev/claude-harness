@@ -21,6 +21,11 @@ invoke_generator() {
     prompt="${prompt} This is retry attempt ${attempt}. Read the evaluator's failure report at harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/eval-report.json and fix every blocking failure."
   fi
 
+  # Inject design spec reference for web-frontend projects
+  if file_exists "${HARNESS_STATE}/design-spec.md"; then
+    prompt="${prompt} IMPORTANT: Read harness-state/design-spec.md and follow the design system exactly -- colors, typography, spacing, component patterns. Do not use library defaults."
+  fi
+
   prompt="${prompt} When done, write your work log to harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/generator-log.md and set harness-state/sprints/sprint-$(sprint_pad "$sprint_num")/status.json to {\"status\": \"ready-for-eval\", \"attempt\": ${attempt}}."
 
   if ! invoke_claude --agent generator --max-turns 200 "$prompt"; then

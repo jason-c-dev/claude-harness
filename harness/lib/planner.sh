@@ -44,6 +44,17 @@ invoke_planner() {
     return 1
   }
 
+  # Check for design spec on web-frontend projects
+  local project_type
+  project_type=$(json_read "${HARNESS_STATE}/config.json" ".projectType")
+  if [[ "$project_type" == "web-frontend" ]]; then
+    if file_exists "${HARNESS_STATE}/design-spec.md"; then
+      log_success "Design spec produced for web-frontend project"
+    else
+      log_warn "Planner did not produce design-spec.md for web-frontend project"
+    fi
+  fi
+
   log_success "Planner produced spec with ${sprint_count} sprints"
   echo "$sprint_count"
 }

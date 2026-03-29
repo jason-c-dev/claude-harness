@@ -91,8 +91,14 @@ Read `harness-state/config.json` for the `projectType` to determine which scorin
 profile to use.
 
 #### Profile: `web-frontend`
-- **Design Quality (0-10)**: Coherent whole vs collection of parts
-- **Originality (0-10)**: Deliberate creative choices vs AI slop
+
+**IMPORTANT: For web-frontend projects, Design Quality and Originality are BLOCKING.**
+A sprint FAILS if Design Quality < 6 or Originality < 5, even if all functional
+criteria pass. If `harness-state/design-spec.md` exists, verify the implementation
+follows the specified palette, typography, spacing, and component patterns.
+
+- **Design Quality (0-10, BLOCKING >= 6)**: Coherent whole vs collection of parts. Follows design-spec.md if present.
+- **Originality (0-10, BLOCKING >= 5)**: Deliberate creative choices vs AI slop. Distinctive identity.
 - **Craft (0-10)**: Typography, spacing, contrast, responsive behavior
 - **Functionality (0-10)**: Core interactions work, users complete tasks without guessing
 
