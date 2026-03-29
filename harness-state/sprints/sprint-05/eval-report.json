@@ -1,0 +1,177 @@
+{
+  "sprintNumber": 5,
+  "attempt": 1,
+  "timestamp": "2026-03-28T22:10:00Z",
+  "overallResult": "PASS",
+  "scores": {
+    "correctness": { "score": 9, "max": 10, "threshold": 7, "pass": true },
+    "completeness": { "score": 9, "max": 10, "threshold": 7, "pass": true },
+    "codeQuality": { "score": 9, "max": 10, "threshold": 6, "pass": true },
+    "robustness": { "score": 8, "max": 10, "threshold": 5, "pass": true },
+    "cliUX": { "score": 8, "max": 10, "threshold": 5, "pass": true }
+  },
+  "criteriaResults": [
+    {
+      "id": "C5-01",
+      "result": "PASS",
+      "evidence": "meta-tests/test-hooks.bats exists (270 lines), starts with #!/usr/bin/env bats shebang, and line 5 has \"load 'helpers/test-helper'\"."
+    },
+    {
+      "id": "C5-02",
+      "result": "PASS",
+      "evidence": "bats meta-tests/test-hooks.bats exits 0. All 28 tests show 'ok'. Output: '1..28' with no 'not ok' lines."
+    },
+    {
+      "id": "C5-03",
+      "result": "PASS",
+      "evidence": "bash meta-tests/run.sh exits 0. All 111 tests pass (28 hook tests + 83 prior sprint tests). No regressions."
+    },
+    {
+      "id": "C5-04",
+      "result": "PASS",
+      "evidence": "grep -c '@test ' test-hooks.bats returns 28, which is >= 20. Tests cover: on-generator-stop (9 tests), on-evaluator-stop (12 tests), on-stop (7 tests)."
+    },
+    {
+      "id": "C5-05",
+      "result": "PASS",
+      "evidence": "Test at line 11: 'on-generator-stop: allows when no active sprint directory exists' -- creates no sprint dirs, asserts exit 0. Passes."
+    },
+    {
+      "id": "C5-06",
+      "result": "PASS",
+      "evidence": "Test at line 17: installs status-ready-for-eval.json and generator-log.md fixture, asserts on-generator-stop.sh exits 0."
+    },
+    {
+      "id": "C5-07",
+      "result": "PASS",
+      "evidence": "Test at line 25: installs status-blocked.json, asserts on-generator-stop.sh exits 0."
+    },
+    {
+      "id": "C5-08",
+      "result": "PASS",
+      "evidence": "Test at line 32: installs status-active.json, asserts exit 2, checks output contains \"not 'ready-for-eval' or 'blocked'\"."
+    },
+    {
+      "id": "C5-09",
+      "result": "PASS",
+      "evidence": "Test at line 40: installs status-ready-for-eval.json but no generator-log.md. Asserts exit 2, checks output contains 'generator-log.md'."
+    },
+    {
+      "id": "C5-10",
+      "result": "PASS",
+      "evidence": "Test at line 49: creates contract-proposal.json, no contract.json, no status.json. Asserts on-generator-stop.sh exits 0."
+    },
+    {
+      "id": "C5-11",
+      "result": "PASS",
+      "evidence": "Two tests: line 57 (fix-issue-42 with active status, exit 2) and line 65 (refactor-cleanup with active status, exit 2). Both verify error message."
+    },
+    {
+      "id": "C5-12",
+      "result": "PASS",
+      "evidence": "Tests at lines 84 and 90: no sprint dirs (exit 0), and only terminal-status sprints (exit 0)."
+    },
+    {
+      "id": "C5-13",
+      "result": "PASS",
+      "evidence": "Test at line 97: installs status-ready-for-eval.json, contract-3criteria.json, and eval-report-pass.json. Asserts exit 0."
+    },
+    {
+      "id": "C5-14",
+      "result": "PASS",
+      "evidence": "Test at line 115: installs status-ready-for-eval.json but no eval-report.json. Asserts exit 2, checks output contains 'eval-report.json'."
+    },
+    {
+      "id": "C5-15",
+      "result": "PASS",
+      "evidence": "Test at line 124: installs eval-report-malformed.json (missing overallResult). Asserts exit 2, checks output contains 'overallResult'."
+    },
+    {
+      "id": "C5-16",
+      "result": "PASS",
+      "evidence": "Test at line 133: creates inline eval-report with overallResult but no criteriaResults. Asserts exit 2, checks output contains 'criteriaResults'."
+    },
+    {
+      "id": "C5-17",
+      "result": "PASS",
+      "evidence": "Test at line 149: contract-3criteria.json (3 criteria) vs inline eval-report with 1 criteriaResult. Asserts exit 2, checks output contains 'criteria'."
+    },
+    {
+      "id": "C5-18",
+      "result": "PASS",
+      "evidence": "Test at line 169: contract-3criteria.json (3 criteria) and eval-report-pass.json (3 criteriaResults). Asserts exit 0."
+    },
+    {
+      "id": "C5-19",
+      "result": "PASS",
+      "evidence": "Test at line 179: contract-proposal.json + contract-review-accepted.json (has decision field), no contract.json. Asserts exit 0."
+    },
+    {
+      "id": "C5-20",
+      "result": "PASS",
+      "evidence": "Test at line 188: contract-proposal.json but no contract-review.json and no contract.json. Asserts exit 2, checks output contains 'contract-review.json'."
+    },
+    {
+      "id": "C5-21",
+      "result": "PASS",
+      "evidence": "Test at line 197: contract-review-no-decision.json (missing decision field). Asserts exit 2, checks output contains 'decision'."
+    },
+    {
+      "id": "C5-22",
+      "result": "PASS",
+      "evidence": "Test at line 211: no sprint-plan.json present. Asserts on-stop.sh exits 0."
+    },
+    {
+      "id": "C5-23",
+      "result": "PASS",
+      "evidence": "Test at line 217: sprint-plan-3sprint.json + 3 sprint dirs all with status-pass.json. Asserts exit 0."
+    },
+    {
+      "id": "C5-24",
+      "result": "PASS",
+      "evidence": "Test at line 227: sprint-02 has status-active.json. Asserts exit 2, checks output contains 'still active'."
+    },
+    {
+      "id": "C5-25",
+      "result": "PASS",
+      "evidence": "Test at line 237: inline status 'negotiating'. Asserts exit 2, checks output contains 'still negotiating'."
+    },
+    {
+      "id": "C5-26",
+      "result": "PASS",
+      "evidence": "Test at line 246: status-ready-for-eval.json. Asserts exit 2, checks output contains 'ready for evaluation'."
+    },
+    {
+      "id": "C5-27",
+      "result": "PASS",
+      "evidence": "Test at line 255: sprint dirs with sprint-plan but no status.json files. Asserts exit 0."
+    },
+    {
+      "id": "C5-28",
+      "result": "PASS",
+      "evidence": "All tests use $HARNESS_STATE relative to TEST_TEMP_DIR. setup() does cd $TEST_TEMP_DIR. Hooks use HARNESS_STATE='harness-state' (relative to cwd). Only reference to 'harness-state' in test file is a comment. No test touches real project directory."
+    },
+    {
+      "id": "C5-29",
+      "result": "PASS",
+      "evidence": "All 28 @test names follow convention: 9 prefixed 'on-generator-stop:', 12 prefixed 'on-evaluator-stop:', 7 prefixed 'on-stop:'. Each has descriptive behavior suffix."
+    },
+    {
+      "id": "C5-30",
+      "result": "PASS",
+      "evidence": "All 13 tests asserting exit 2 also verify $output contains relevant substring: 'not ready-for-eval or blocked', 'generator-log.md', 'eval-report.json', 'overallResult', 'criteriaResults', 'criteria', 'contract-review.json', 'decision', 'still active', 'still negotiating', 'ready for evaluation'."
+    }
+  ],
+  "regression": {
+    "sprintsChecked": [1, 2, 3, 4],
+    "criteriaChecked": 118,
+    "pass": 118,
+    "fail": 0,
+    "failures": [],
+    "method": "Full meta-tests suite via 'bash meta-tests/run.sh': all 111 tests pass (exit 0). Covers test-infrastructure.bats (sprint 1), test-utils-pure.bats (sprint 2), test-utils-state.bats (sprint 3), test-git.bats (sprint 4), and test-hooks.bats (sprint 5)."
+  },
+  "passCount": 30,
+  "failCount": 0,
+  "blockingFailures": 0,
+  "summary": "All 30 criteria PASS. 28 hook validation tests cover all 3 hooks across allow and block scenarios. Tests are well-isolated in temp directories, follow naming conventions, and verify both exit codes and error messages. Full regression suite (111 tests across sprints 1-4) passes with zero failures."
+}
