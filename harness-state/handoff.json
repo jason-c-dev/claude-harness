@@ -14,9 +14,9 @@
   "devServerCommand": "",
   "devServerPort": 0,
   "git": {
-    "harnessBranch": "",
+    "harnessBranch": "harness/build-a-comprehensive-bats-core-test-suite-for-thi",
     "latestTag": "harness/sprint-03/pass",
-    "latestMergeSha": "Deleted branch harness/build-a-comprehensive-bats-core-test-suite-for-thi-sprint-03 (was 2554014).\nc4003bfda0c51b37555384018ed6c146d7633de0",
+    "latestMergeSha": "c4003bf",
     "prNumbers": []
   }
 }

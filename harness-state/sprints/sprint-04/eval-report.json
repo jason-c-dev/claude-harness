@@ -1,179 +1,192 @@
 {
   "sprintNumber": 4,
-  "attempt": 1,
   "overallResult": "PASS",
+  "attempt": 1,
+  "timestamp": "2026-03-28T21:45:00Z",
   "passCount": 28,
   "failCount": 0,
-  "timestamp": "2026-03-28T21:30:00Z",
   "criteria": [
     {
       "id": "C4-01",
       "result": "PASS",
-      "evidence": "meta-tests/test-git.bats exists (471 lines), starts with '#!/usr/bin/env bats' shebang on line 1, and loads helper via \"load 'helpers/test-helper'\" on line 8."
+      "evidence": "meta-tests/test-git.bats exists (470 lines). Starts with '#!/usr/bin/env bats' shebang. Contains \"load 'helpers/test-helper'\" at line 8."
     },
     {
       "id": "C4-02",
       "result": "PASS",
-      "evidence": "Ran 'bats meta-tests/test-git.bats': exit code 0, all 25 tests show 'ok', no 'not ok' lines."
+      "evidence": "'bats meta-tests/test-git.bats' exits 0. All 25 tests show 'ok'. Zero 'not ok' results."
     },
     {
       "id": "C4-03",
       "result": "PASS",
-      "evidence": "Ran 'bash meta-tests/run.sh': exit code 0, 83 tests total (25 git + 58 prior), all pass, no regressions."
+      "evidence": "'bash meta-tests/run.sh' exits 0. All 83 tests pass across 4 test files (test-git, test-infrastructure, test-utils-pure, test-utils-state). Completed in 9s."
     },
     {
       "id": "C4-04",
       "result": "PASS",
-      "evidence": "25 @test blocks found (>= 20 required). All 6 git.sh functions covered: git_create_harness_branch (4), git_create_sprint_branch (4), git_merge_sprint (6), git_fail_sprint_attempt (4), git_commit_harness_state (3), generate_pr_body (4)."
+      "evidence": "25 @test blocks counted (>= 20 threshold). Covers all 6 git.sh functions: git_create_harness_branch (4), git_create_sprint_branch (4), git_merge_sprint (6), git_fail_sprint_attempt (4), git_commit_harness_state (3), generate_pr_body (4)."
     },
     {
       "id": "C4-05",
       "result": "PASS",
-      "evidence": "Test at line 27 calls git_create_harness_branch 'my-project' and asserts 'harness/my-project' branch exists via git rev-parse --verify. Test passes."
+      "evidence": "Test 'git_create_harness_branch: creates a harness/{slug} branch from main' (line 27) calls git_create_harness_branch with 'my-project', then asserts branch 'harness/my-project' exists via git rev-parse --verify. Passes."
     },
     {
       "id": "C4-06",
       "result": "PASS",
-      "evidence": "Test at line 37 captures output via 'run --separate-stderr git_create_harness_branch \"test-slug\"' and asserts output == 'harness/test-slug'. Test passes."
+      "evidence": "Test 'git_create_harness_branch: returns branch name on stdout' (line 37) uses 'run --separate-stderr' to capture output and asserts '$output == \"harness/test-slug\"'. Passes."
     },
     {
       "id": "C4-07",
       "result": "PASS",
-      "evidence": "Test at line 46 calls git_create_harness_branch 'idempotent-test' twice (with checkout to main between calls), asserts second call exits 0, returns correct branch name, and repo is on correct branch. Test passes."
+      "evidence": "Test 'git_create_harness_branch: is idempotent...' (line 46) calls function twice with 'idempotent-test'. Second call succeeds (exit 0), output matches, and git branch --show-current confirms correct branch. Passes."
     },
     {
       "id": "C4-08",
       "result": "PASS",
-      "evidence": "Test at line 81 calls git_create_sprint_branch 'harness/my-project' 3 and verifies branch 'harness/my-project-sprint-03' exists (zero-padded). Test passes."
+      "evidence": "Test 'git_create_sprint_branch: creates branch with zero-padded sprint number' (line 81) passes sprint number 3 and verifies 'harness/my-project-sprint-03' exists. Passes."
     },
     {
       "id": "C4-09",
       "result": "PASS",
-      "evidence": "Test at line 92 checks output == 'harness/my-project-sprint-05' and asserts current branch is the sprint branch after the call. Test passes."
+      "evidence": "Test 'git_create_sprint_branch: returns branch name on stdout and leaves repo on sprint branch' (line 92) checks output == 'harness/my-project-sprint-05' and verifies current branch matches. Passes."
     },
     {
       "id": "C4-10",
       "result": "PASS",
-      "evidence": "Test at line 107 pre-creates stale 'harness/my-project-sprint-02' branch with a commit, advances harness HEAD, calls git_create_sprint_branch, and asserts the new sprint branch HEAD matches the harness branch HEAD (not the stale SHA). Test passes."
+      "evidence": "Test at line 107 pre-creates a stale sprint branch with a commit, advances harness HEAD, then calls git_create_sprint_branch. Asserts new sprint branch HEAD matches harness HEAD (not stale SHA). Passes."
     },
     {
       "id": "C4-11",
       "result": "PASS",
-      "evidence": "Test at line 151 sets up harness and sprint branches with a commit, calls git_merge_sprint, verifies current branch is 'harness/my-project', and verifies merge commit message contains 'harness(sprint-01)' via git log --oneline. Test passes."
+      "evidence": "Test 'git_merge_sprint: performs a --no-ff merge...' (line 151) sets up harness+sprint branches, commits on sprint, calls git_merge_sprint. Verifies current branch is harness and merge commit message contains 'harness(sprint-01)'. Passes."
     },
     {
       "id": "C4-12",
       "result": "PASS",
-      "evidence": "Test at line 174 calls git_merge_sprint and verifies tag 'harness/sprint-01/pass' exists via git rev-parse --verify. Also asserts tag SHA equals HEAD SHA (tag points to merge commit). Test passes."
+      "evidence": "Test at line 174 calls git_merge_sprint then verifies 'harness/sprint-01/pass' tag exists. Asserts tag SHA equals HEAD SHA on harness branch. Passes."
     },
     {
       "id": "C4-13",
       "result": "PASS",
-      "evidence": "Test at line 195 calls git_merge_sprint then runs 'git rev-parse --verify harness/my-project-sprint-01' and asserts it fails (status != 0), confirming sprint branch is deleted. Test passes."
+      "evidence": "Test at line 195 calls git_merge_sprint then runs 'git rev-parse --verify harness/my-project-sprint-01' which fails (status != 0), confirming branch is deleted. Passes."
     },
     {
       "id": "C4-14",
       "result": "PASS",
-      "evidence": "Test at line 211 captures output of git_merge_sprint via --separate-stderr, gets HEAD SHA, and asserts output contains the merge SHA via glob match. Test passes."
+      "evidence": "Test at line 211 captures output of git_merge_sprint with '--separate-stderr'. Verifies output contains HEAD SHA of harness branch. Passes."
     },
     {
       "id": "C4-15",
       "result": "PASS",
-      "evidence": "Test at line 230 creates uncommitted file 'uncommitted.txt' on sprint branch, calls git_merge_sprint, then verifies the file exists and contains expected content on the harness branch after merge. Test passes."
+      "evidence": "Test at line 230 creates committed work + uncommitted 'uncommitted.txt' on sprint branch, calls git_merge_sprint. Verifies file exists and content matches on harness branch after merge. Passes."
     },
     {
       "id": "C4-16",
       "result": "PASS",
-      "evidence": "Test at line 269 sets up sprint branch with a commit, calls git_fail_sprint_attempt with attempt=2, and verifies tag 'harness/sprint-01/attempt-2' exists via git rev-parse --verify. Test passes."
+      "evidence": "Test at line 269 sets up sprint branch, commits, calls git_fail_sprint_attempt with attempt=2. Verifies tag 'harness/sprint-01/attempt-2' exists via git rev-parse. Passes."
     },
     {
       "id": "C4-17",
       "result": "PASS",
-      "evidence": "Test at line 284 calls git_fail_sprint_attempt, asserts current branch is 'harness/my-project' (harness branch), and asserts sprint branch no longer exists (git rev-parse --verify fails). Test passes."
+      "evidence": "Test at line 284 calls git_fail_sprint_attempt. Asserts current branch is harness branch and sprint branch no longer exists (rev-parse fails). Passes."
     },
     {
       "id": "C4-18",
       "result": "PASS",
-      "evidence": "Test at line 305 creates a tracked file, commits it, then modifies it (dirty working tree), calls git_fail_sprint_attempt, asserts exit 0, and verifies git status --porcelain is empty (clean working directory). Test passes."
+      "evidence": "Test at line 305 creates tracked file, commits it, modifies it (dirty tree), calls git_fail_sprint_attempt. Exit 0 confirmed. 'git status --porcelain' returns empty (clean working directory). Passes."
     },
     {
       "id": "C4-19",
       "result": "PASS",
-      "evidence": "Test at line 355 modifies harness-state/config.json, calls git_commit_harness_state with message 'harness(sprint-01): update config', and verifies git log -1 shows the expected commit message. Test passes."
+      "evidence": "Test at line 355 writes to $HARNESS_STATE/config.json, calls git_commit_harness_state. Verifies git log -1 message matches. Passes."
     },
     {
       "id": "C4-20",
       "result": "PASS",
-      "evidence": "Test at line 369 records commit count before, calls git_commit_harness_state with no pending changes, and asserts commit count is unchanged. Test passes."
+      "evidence": "Test at line 369 records commit count before, calls git_commit_harness_state with no changes, verifies commit count unchanged. Passes."
     },
     {
       "id": "C4-21",
       "result": "PASS",
-      "evidence": "Test at line 382 creates initial tracked config.json, modifies it, adds new untracked new-file.json, calls git_commit_harness_state, and verifies both files appear in the commit via git diff-tree. Test passes."
+      "evidence": "Test at line 382 creates initial tracked file, commits it, then modifies it AND adds new untracked file. Calls git_commit_harness_state. Verifies both files appear in git diff-tree output. Passes."
     },
     {
       "id": "C4-22",
       "result": "PASS",
-      "evidence": "Test at line 409 installs config-valid.json and sprint-plan-3sprint.json fixtures, calls generate_pr_body, and asserts output contains the exact table header '| Sprint | Name | Status | Criteria | Pass | Fail | Attempts | Cost |'. Test passes."
+      "evidence": "Test at line 409 installs config and sprint-plan fixtures, calls generate_pr_body, greps output for exact table header '| Sprint | Name | Status | Criteria | Pass | Fail | Attempts | Cost |'. Passes."
     },
     {
       "id": "C4-23",
       "result": "PASS",
-      "evidence": "Test at line 423 installs eval-report-pass.json fixture for sprint-01, calls generate_pr_body, and asserts output contains 'PASS'. Test passes."
+      "evidence": "Test at line 423 installs eval-report-pass.json fixture for sprint 1, calls generate_pr_body. Output contains 'PASS'. Passes."
     },
     {
       "id": "C4-24",
       "result": "PASS",
-      "evidence": "Test at line 440 installs eval report only for sprint 1 (plan has 3 sprints), calls generate_pr_body, and asserts output contains 'pending' for sprints without reports. Test passes."
+      "evidence": "Test at line 440 provides eval report only for sprint 1 of a 3-sprint plan. Output contains 'pending' for sprints without reports. Passes."
     },
     {
       "id": "C4-25",
       "result": "PASS",
-      "evidence": "Test at line 457 calls generate_pr_body with config-valid.json fixture and asserts output contains 'opus', 'reset', and 'web-app' (the model, context strategy, and project type values from the fixture). Test passes."
+      "evidence": "Test at line 457 calls generate_pr_body. Verifies output contains 'opus', 'reset', and 'web-app' from config-valid.json fixture. Passes."
     },
     {
       "id": "C4-26",
       "result": "PASS",
-      "evidence": "The custom setup() function (lines 10-21) creates a fresh TEST_TEMP_DIR via mktemp -d and cd's into it for every test. Every git-dependent test calls init_test_repo which does 'git init . -q -b main'. No test references branches, tags, or state from another test."
+      "evidence": "All 25 @test blocks call init_test_repo (25 matches confirmed by grep). setup() creates fresh TEST_TEMP_DIR per test via mktemp -d. No test references branches or tags that only exist if another test ran first."
     },
     {
       "id": "C4-27",
       "result": "PASS",
-      "evidence": "All 25 test names verified via regex against pattern '^[a-z_]+: '. All follow 'function_name: descriptive behavior' convention (e.g., 'git_create_harness_branch: creates a harness/{slug} branch from main')."
+      "evidence": "All 25 test names follow 'function_name: descriptive behavior' convention. Examples: 'git_create_harness_branch: creates a harness/{slug} branch from main', 'git_merge_sprint: performs a --no-ff merge of sprint branch into harness branch', 'generate_pr_body: shows pending status for sprints without eval reports'."
     },
     {
       "id": "C4-28",
       "result": "PASS",
-      "evidence": "Lines 19-20 use source_harness_lib 'utils.sh' and source_harness_lib 'git.sh'. Only mention of 'harness/lib/git.sh' is in a comment on line 2, not a source path. No hardcoded source paths."
+      "evidence": "setup() at lines 19-20 uses source_harness_lib 'utils.sh' and source_harness_lib 'git.sh'. No hardcoded paths to harness/lib/git.sh. Line 2 mentions harness/lib/git.sh in a comment only."
     }
   ],
   "regression": {
-    "sprints": [1, 2, 3],
+    "tested": true,
+    "regressionSprints": [1, 2, 3],
     "result": "PASS",
-    "evidence": "Full suite via 'bash meta-tests/run.sh' passes with 83 tests (25 new git tests + 8 test-helper + 27 test-utils-pure + 23 test-utils-state), exit code 0. No regressions detected."
+    "details": "Full suite 'bash meta-tests/run.sh' exits 0 with all 83 tests passing. Sprint 1 infrastructure intact (run.sh executable, helpers/, fixtures/ with 23 fixture files). Sprint 2 tests (test-utils-pure.bats, 22 tests) all pass. Sprint 3 tests (test-utils-state.bats, 28 tests) all pass."
   },
   "holistic": {
-    "correctness": {
-      "score": 10,
-      "notes": "All 25 tests pass. Full suite of 83 tests passes with no failures."
-    },
-    "testCoverage": {
-      "score": 9,
-      "notes": "All 6 git.sh functions covered. 25 tests exceed the 20 minimum. Covers success paths, edge cases (idempotency, stale branches, dirty working tree, no-op commits), and output verification. Minor observation: git.sh creates lightweight tags (git tag without -a), which the tests correctly verify, though contract description says 'annotated tag'."
-    },
-    "codeQuality": {
-      "score": 9,
-      "notes": "Consistent naming convention. Well-organized with section headers. Proper use of '--separate-stderr' for stdout isolation. Pragmatic workarounds for bash 3.2 limitations (glob match instead of negative array index). No linting issues."
-    },
-    "testIsolation": {
-      "score": 10,
-      "notes": "Every test gets a fresh temp directory and git repo. No inter-test dependencies. teardown() from test-helper properly cleans up temp dirs."
-    },
-    "robustness": {
-      "score": 9,
-      "notes": "Tests handle edge cases well: stale branch replacement, dirty working trees, multiple failed attempts, no-op commits. Works correctly with macOS bash 3.2 constraints."
-    }
-  },
-  "primaryScore": 9.4,
-  "notes": "Excellent implementation. All 28 criteria pass. 25 well-structured, isolated tests covering all 6 git.sh functions with proper assertions. The full suite of 83 tests passes with no regressions. Minor observation: the annotated tag description in C4-12 does not match the lightweight tag created by git.sh, but the test correctly verifies actual behavior."
+    "projectType": "cli-tool",
+    "dimensions": [
+      {
+        "name": "Correctness & Reliability",
+        "score": 9,
+        "rationale": "All 25 tests pass on first run. Tests correctly validate all 6 git.sh functions with meaningful assertions that verify actual git state (branch existence, HEAD SHA, tag resolution, working tree cleanliness) rather than just exit codes."
+      },
+      {
+        "name": "Error Handling & Edge Cases",
+        "score": 8,
+        "rationale": "Covers key edge cases: idempotent branch creation, stale branch cleanup, dirty working tree handling, no-op commit behavior, double-digit sprint numbers, multiple sequential failed attempts. Edge cases like invalid inputs are explicitly out of scope per contract (sprint 6)."
+      },
+      {
+        "name": "Code Quality & Maintainability",
+        "score": 9,
+        "rationale": "Well-organized with clear section headers per function. Consistent patterns across all tests: init_test_repo at top, run --separate-stderr for output capture, explicit assertions. Uses helper abstractions (source_harness_lib, install_fixture, init_test_repo). No code duplication."
+      },
+      {
+        "name": "Test Quality & Coverage",
+        "score": 9,
+        "rationale": "25 tests covering all 6 public functions with 3-6 tests each. Tests verify behavior not implementation (checks git state post-call, not internal function mechanics). Each test is isolated via mktemp -d + init_test_repo. Multi-step scenarios validate complex workflows (create, advance, recreate, verify)."
+      },
+      {
+        "name": "Documentation & Usability",
+        "score": 8,
+        "rationale": "File header describes coverage scope across all 6 functions. Section headers organize tests logically. Test names are self-documenting and follow consistent convention. Comments explain non-obvious setups. Minor gap: complex multi-assertion tests could benefit from inline comments explaining what each assertion verifies."
+      },
+      {
+        "name": "Performance",
+        "score": 9,
+        "rationale": "Full 83-test suite completes in 9 seconds including 25 new git-heavy tests. Each test uses lightweight temp directories with small repos (1-3 commits). No unnecessary waits, sleeps, or retries."
+      }
+    ],
+    "primaryScore": 8.7
+  }
 }
