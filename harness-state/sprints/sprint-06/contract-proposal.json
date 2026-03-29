@@ -1,0 +1,304 @@
+{
+  "sprintNumber": 6,
+  "name": "Edge Cases and Polish",
+  "theme": "Boundary conditions, malformed input, error recovery, and run.sh integration verification",
+  "features": ["F8: Edge Case and Error Handling Tests (meta-tests/test-edge-cases.bats)"],
+  "dependsOn": [2, 3, 4, 5],
+  "criteria": [
+    {
+      "id": "C6-01",
+      "category": "file-structure",
+      "description": "meta-tests/test-edge-cases.bats exists, is a valid bats file, and loads the test helper via 'load helpers/test-helper'",
+      "testMethod": "file-inspection",
+      "testSteps": [
+        "Verify meta-tests/test-edge-cases.bats exists and is non-empty",
+        "Verify it contains a bats shebang or is loadable by bats",
+        "Verify it contains \"load 'helpers/test-helper'\" or equivalent"
+      ],
+      "threshold": "All checks pass"
+    },
+    {
+      "id": "C6-02",
+      "category": "test-execution",
+      "description": "All tests in test-edge-cases.bats pass when run via 'bats meta-tests/test-edge-cases.bats'",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bats meta-tests/test-edge-cases.bats",
+        "Verify exit code is 0",
+        "Verify no tests show as 'not ok'"
+      ],
+      "threshold": "Exit code 0, all tests pass"
+    },
+    {
+      "id": "C6-03",
+      "category": "test-execution",
+      "description": "The full meta-tests suite still passes (no regressions): 'bash meta-tests/run.sh' exits 0",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bash meta-tests/run.sh",
+        "Verify exit code is 0",
+        "Verify summary line appears showing completion time"
+      ],
+      "threshold": "Exit code 0"
+    },
+    {
+      "id": "C6-04",
+      "category": "test-coverage",
+      "description": "test-edge-cases.bats contains at least 15 @test blocks covering edge cases across multiple modules",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Count lines matching '@test ' in test-edge-cases.bats",
+        "Verify count >= 15"
+      ],
+      "threshold": ">= 15 test blocks"
+    },
+    {
+      "id": "C6-05",
+      "category": "slugify-edge",
+      "description": "Test: slugify with a string containing only special characters (e.g., '!@#$%^&*()') returns empty string",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that passes a string of only special characters to slugify",
+        "Verify the test asserts the output is an empty string"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-06",
+      "category": "slugify-edge",
+      "description": "Test: slugify with a string containing only spaces returns empty string",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test exists that passes a string of only spaces (e.g., '     ') to slugify",
+        "Verify the test asserts the output is an empty string"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-07",
+      "category": "json_read-edge",
+      "description": "Test: json_read with a binary file does not crash and returns empty string",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a binary file (e.g., printf '\\x00\\x01\\x02' > file) and calls json_read on it",
+        "Verify the test asserts exit code 0 (graceful handling) and output is empty"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-08",
+      "category": "json_read-edge",
+      "description": "Test: json_read with truncated JSON (e.g., '{\"name\": ') returns empty string without crashing",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a file containing truncated/incomplete JSON",
+        "Verify the test calls json_read and asserts graceful handling (exit 0, empty output)"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-09",
+      "category": "json_read-edge",
+      "description": "Test: json_read with a deeply nested path (e.g., '.a.b.c.d.e') on a file that has that nested structure returns the correct value",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a deeply nested JSON file and calls json_read with a multi-level path",
+        "Verify the test asserts the correct deeply nested value is returned"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-10",
+      "category": "init-edge",
+      "description": "Test: init_harness_state with a prompt containing double quotes, single quotes, and backslashes produces valid JSON in config.json",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls init_harness_state with a prompt like 'Build a \"great\" app with \\'features\\' and C:\\\\path'",
+        "Verify the test asserts config.json is valid JSON (jq parses it without error)",
+        "Verify the test asserts userPrompt field contains the original prompt text"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-11",
+      "category": "init-edge",
+      "description": "Test: init_harness_state with a prompt containing newlines produces valid JSON in config.json",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls init_harness_state with a prompt containing literal newline characters",
+        "Verify the test asserts config.json is valid JSON (jq -e . returns 0)",
+        "Verify the userPrompt field preserves the newline content"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-12",
+      "category": "handoff-edge",
+      "description": "Test: update_handoff called before init_harness_state creates handoff.json from scratch with correct structure",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test ensures no handoff.json exists, then calls update_handoff",
+        "Verify the test asserts handoff.json is created with completedSprints array, currentSprint, and git fields"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-13",
+      "category": "registry-edge",
+      "description": "Test: update_regression_registry with malformed (non-parseable) contract JSON does not crash and does not corrupt the registry",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates a contract.json with invalid JSON content (e.g., 'not json at all')",
+        "Verify the test calls update_regression_registry and asserts it does not crash (exit 0 or handles error)",
+        "Verify the registry.json remains unchanged/valid after the call"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-14",
+      "category": "git-edge",
+      "description": "Test: git_create_sprint_branch fails gracefully when the harness branch does not exist",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test initializes a git repo but does NOT create the harness branch",
+        "Verify the test calls git_create_sprint_branch with a non-existent harness branch",
+        "Verify the test asserts a non-zero exit code (the function should fail, not create an orphan branch)"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-15",
+      "category": "hooks-edge",
+      "description": "Test: on-generator-stop.sh handles multiple sprint directories with mixed statuses and picks the active one correctly",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates multiple sprint directories (e.g., sprint-01 with status 'pass', sprint-02 with status 'active')",
+        "Verify on-generator-stop.sh blocks (exit 2) because the active sprint is not ready-for-eval"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-16",
+      "category": "hooks-edge",
+      "description": "Test: hooks work correctly when HARNESS_STATE points to a non-default path (hooks hardcode 'harness-state', so this test verifies that behavior or documents the limitation)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test documents/tests behavior when the working directory has 'harness-state' at the expected relative path",
+        "Verify the hook reads from the correct location under the working directory"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-17",
+      "category": "hooks-edge",
+      "description": "Test: on-stop.sh handles the case where sprint-plan.json has sprints but no corresponding sprint directories exist at all",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test installs sprint-plan-3sprint.json but creates no sprint directories",
+        "Verify the test asserts on-stop.sh exits 0 (no directories means no in-progress sprints)"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-18",
+      "category": "state-edge",
+      "description": "Test: log_cost handles non-JSON output_json argument gracefully (doesn't crash, defaults to 0 tokens)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test calls log_cost with a non-JSON string as the third argument",
+        "Verify the function completes without error",
+        "Verify the appended entry has inputTokens and outputTokens set to 0"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-19",
+      "category": "state-edge",
+      "description": "Test: update_progress works when sprint-plan.json is missing (sprint name should be empty or handled gracefully)",
+      "testMethod": "bats-test-inspection",
+      "testSteps": [
+        "Verify a @test creates progress.md but no sprint-plan.json",
+        "Verify calling update_progress doesn't crash",
+        "Verify an entry is still appended to progress.md"
+      ],
+      "threshold": "Test exists and passes"
+    },
+    {
+      "id": "C6-20",
+      "category": "run-sh-integration",
+      "description": "run.sh prints a summary line containing completion time and exit code after tests finish",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bash meta-tests/run.sh 2>&1",
+        "Verify output contains 'Meta-tests completed in' followed by a duration and exit code"
+      ],
+      "threshold": "Summary line present in output"
+    },
+    {
+      "id": "C6-21",
+      "category": "run-sh-integration",
+      "description": "run.sh --filter supports filtering tests by name pattern",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: bash meta-tests/run.sh --filter 'slugify' 2>&1",
+        "Verify exit code is 0",
+        "Verify output contains test names matching 'slugify' but not unrelated tests like 'sprint_pad'"
+      ],
+      "threshold": "Filter correctly limits test execution"
+    },
+    {
+      "id": "C6-22",
+      "category": "test-isolation",
+      "description": "Every @test in test-edge-cases.bats works in the test temp directory -- no test modifies the real harness-state/",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Verify tests use install_fixture or create files in $TEST_TEMP_DIR/$HARNESS_STATE",
+        "Verify no test writes to the project's actual harness-state/ directory",
+        "Verify setup() is present and creates the temp directory"
+      ],
+      "threshold": "All tests are isolated"
+    },
+    {
+      "id": "C6-23",
+      "category": "test-quality",
+      "description": "Test names follow a 'module_or_function: edge case description' convention for readability",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Inspect all @test names in test-edge-cases.bats",
+        "Verify each follows 'function_name: description' or 'module: description' pattern (e.g., 'slugify: only special characters returns empty')"
+      ],
+      "threshold": "All test names follow the convention"
+    },
+    {
+      "id": "C6-24",
+      "category": "test-quality",
+      "description": "Edge case tests that expect errors verify the function doesn't crash (checks exit status) AND verifies the output/state is reasonable",
+      "testMethod": "content-inspection",
+      "testSteps": [
+        "Inspect @test blocks that test error/edge scenarios",
+        "Verify each checks both exit status and output/state (not just one or the other)"
+      ],
+      "threshold": "Error tests verify both status and output"
+    },
+    {
+      "id": "C6-25",
+      "category": "suite-completeness",
+      "description": "The full meta-tests suite (all .bats files) contains at least 80 total @test blocks across all test files",
+      "testMethod": "command-execution",
+      "testSteps": [
+        "Run: grep -c '@test ' meta-tests/*.bats | awk -F: '{sum+=$2} END{print sum}'",
+        "Verify the total count is >= 80"
+      ],
+      "threshold": ">= 80 total test blocks across all .bats files"
+    }
+  ],
+  "outOfScope": [
+    "Modifying existing test files from sprints 2-5 (test-utils-pure.bats, test-utils-state.bats, test-git.bats, test-hooks.bats)",
+    "Testing with real Claude invocations or network calls",
+    "Modifying the harness source code (utils.sh, git.sh, hooks) -- only testing their edge cases",
+    "Modifying run.sh or the test helper library beyond what's needed for edge case support",
+    "Performance benchmarking or timing tests",
+    "Testing git_create_pr or git_create_issue (these require gh CLI and remote repos)"
+  ],
+  "regressionSprints": [1, 2, 3, 4, 5]
+}

@@ -1,0 +1,155 @@
+{
+  "sprintNumber": 6,
+  "decision": "accepted",
+  "reviewedAt": "2026-03-28T00:00:00Z",
+  "summary": "Solid contract with 25 criteria covering all major F8 edge-case scenarios from the product spec. Criteria are testable and specific, prescribed behaviors align with actual function implementations, and regression sprints are correctly listed. Accepting with advisory notes on minor gaps and one criterion that could be sharper.",
+  "criteriaReview": {
+    "testability": "PASS — Every criterion has explicit test steps and a clear pass/fail threshold. The evaluator can verify each one via file inspection, content inspection, or command execution without ambiguity.",
+    "coverageVsSprintPlan": "PASS — Sprint plan feature F8 (Edge Case and Error Handling Tests) is thoroughly covered. The contract maps to nearly every scenario listed in the product spec's F8 section: slugify edge cases (C6-05, C6-06), json_read edge cases (C6-07, C6-08, C6-09), init_harness_state special characters (C6-10, C6-11), update_handoff before init (C6-12), malformed registry input (C6-13), missing git branch (C6-14), hook edge cases (C6-15, C6-16, C6-17), state function edge cases (C6-18, C6-19), and run.sh integration (C6-20, C6-21).",
+    "coverageVsProductSpec": "PASS with advisory — See 'missingFromSpec' below for two omitted scenarios.",
+    "regressionSprints": "PASS — All five prior sprints [1,2,3,4,5] listed, matching completedSprints in handoff.json.",
+    "outOfScope": "PASS — Boundaries are reasonable. Not modifying prior test files or harness source, only adding new edge-case tests."
+  },
+  "criteriaDetails": [
+    {
+      "id": "C6-01",
+      "verdict": "ok",
+      "note": "Standard file-existence check. Clear and testable."
+    },
+    {
+      "id": "C6-02",
+      "verdict": "ok",
+      "note": "Primary execution gate — all edge-case tests must pass."
+    },
+    {
+      "id": "C6-03",
+      "verdict": "ok",
+      "note": "Full-suite regression via run.sh. Essential for verifying no interaction between new edge-case tests and existing tests."
+    },
+    {
+      "id": "C6-04",
+      "verdict": "ok",
+      "note": "Threshold >= 15 aligns exactly with the 15 specific edge-case criteria (C6-05 through C6-19). Tight but correct — generator must implement all specified scenarios."
+    },
+    {
+      "id": "C6-05",
+      "verdict": "ok",
+      "note": "Verified: slugify uses sed to strip non-alphanumeric chars. A string of only special characters → all stripped → empty string after leading/trailing hyphen removal. Behavior confirmed."
+    },
+    {
+      "id": "C6-06",
+      "verdict": "ok",
+      "note": "Spaces are converted to hyphens, then leading/trailing hyphens stripped → empty. Confirmed."
+    },
+    {
+      "id": "C6-07",
+      "verdict": "ok",
+      "note": "Verified in source: json_read uses 'jq ... 2>/dev/null || echo \"\"'. Binary input fails jq silently, falls through to echo empty string. Exit 0 is correct expected behavior."
+    },
+    {
+      "id": "C6-08",
+      "verdict": "ok",
+      "note": "Truncated JSON also fails jq parse, same graceful fallback to empty string. Confirmed."
+    },
+    {
+      "id": "C6-09",
+      "verdict": "ok",
+      "note": "Deeply nested valid JSON with matching path should return correct value via jq. Straightforward."
+    },
+    {
+      "id": "C6-10",
+      "verdict": "ok",
+      "note": "Tests JSON escaping in init_harness_state. Important edge case — confirms prompt with quotes/backslashes doesn't break config.json. Test steps are specific: verify jq parses it AND verify prompt content preserved."
+    },
+    {
+      "id": "C6-11",
+      "verdict": "ok",
+      "note": "Newlines in prompt are another JSON escaping hazard. Good complement to C6-10."
+    },
+    {
+      "id": "C6-12",
+      "verdict": "ok",
+      "note": "Verified: update_handoff checks file_exists and creates from scratch if missing. Test correctly expects completedSprints, currentSprint, and git fields."
+    },
+    {
+      "id": "C6-13",
+      "verdict": "ok",
+      "note": "Verified: file_exists returns true for non-empty malformed file, then jq fails on malformed JSON. The '&&' chain prevents mv, so registry stays intact. Criterion's 'exit 0 or handles error' language gives appropriate flexibility."
+    },
+    {
+      "id": "C6-14",
+      "verdict": "ok",
+      "note": "Good negative test — verifies git_create_sprint_branch doesn't silently create an orphan branch."
+    },
+    {
+      "id": "C6-15",
+      "verdict": "ok",
+      "note": "Tests hook's sprint-directory scanning logic with multiple directories. Meaningful edge case."
+    },
+    {
+      "id": "C6-16",
+      "verdict": "advisory",
+      "note": "Description is self-contradictory: says 'hooks work correctly when HARNESS_STATE points to a non-default path' but acknowledges 'hooks hardcode harness-state'. The test will effectively just confirm the hook uses the hardcoded relative path from CWD. This is fine as a documentation-test but the description oversells what's being tested. Generator should write a test that confirms the hardcoded-path behavior rather than trying to make a non-default path work."
+    },
+    {
+      "id": "C6-17",
+      "verdict": "ok",
+      "note": "Sprint plan exists but no sprint directories → no active sprints → on-stop.sh allows exit. Clean boundary test."
+    },
+    {
+      "id": "C6-18",
+      "verdict": "ok",
+      "note": "Verified: log_cost pipes output_json through jq with '2>/dev/null || echo 0'. Non-JSON input → 0 tokens. Correct."
+    },
+    {
+      "id": "C6-19",
+      "verdict": "ok",
+      "note": "Verified: update_progress calls json_read on sprint-plan.json. If missing, json_read returns empty string. Sprint name will be empty but function won't crash. Cat appends to progress.md regardless."
+    },
+    {
+      "id": "C6-20",
+      "verdict": "ok",
+      "note": "Integration verification of run.sh output format. Already required by sprint 1 (C1-06) but now explicitly testing the summary line content."
+    },
+    {
+      "id": "C6-21",
+      "verdict": "ok",
+      "note": "--filter was required by C1-07 (code inspection only). This criterion actually executes it and verifies filtering works. Good integration test."
+    },
+    {
+      "id": "C6-22",
+      "verdict": "ok",
+      "note": "Critical quality gate — ensures edge-case tests don't accidentally mutate real harness-state/."
+    },
+    {
+      "id": "C6-23",
+      "verdict": "ok",
+      "note": "Naming convention is testable via pattern matching on @test lines."
+    },
+    {
+      "id": "C6-24",
+      "verdict": "ok",
+      "note": "Ensures error-path tests check both exit status AND output/state, not just one. Good test quality requirement."
+    },
+    {
+      "id": "C6-25",
+      "verdict": "advisory",
+      "note": "Current suite already has 111 @test blocks across 5 files. The >= 80 threshold is pre-satisfied without any sprint 6 work. This criterion functions as a regression sanity check, not a sprint 6 deliverable. Not a problem — just noting it doesn't constrain the generator's work."
+    }
+  ],
+  "missingFromSpec": [
+    {
+      "scenario": "git_merge_sprint with merge conflicts",
+      "specReference": "Product spec F8: 'git_merge_sprint with merge conflicts (should they arise)'",
+      "severity": "low",
+      "rationale": "The spec's parenthetical '(should they arise)' marks this as aspirational. Setting up a realistic merge conflict in a bats test requires creating divergent branches with conflicting changes, which is complex and fragile. Acceptable to omit from the contract given the 'medium' complexity estimate for this sprint."
+    },
+    {
+      "scenario": "Hooks receiving empty stdin",
+      "specReference": "Product spec F8: 'Hooks receiving empty stdin (they should still work -- hooks always cat stdin first)'",
+      "severity": "none",
+      "rationale": "The test helper's run_hook function already pipes empty stdin to hooks. Every hook test in sprint 5 implicitly tests this scenario. Not a real gap."
+    }
+  ],
+  "overallAssessment": "The contract is well-crafted. 25 criteria provide thorough coverage of F8's edge-case scenarios with specific, verifiable test steps. The prescribed behaviors (exit codes, output values) were verified against actual source implementations and are accurate. Regression sprint coverage is complete. The two advisory notes (C6-16 description ambiguity, C6-25 pre-satisfied threshold) are informational — neither blocks acceptance. The one missing spec scenario (merge conflicts) is reasonably omitted given its complexity and aspirational framing in the spec."
+}
