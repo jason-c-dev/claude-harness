@@ -46,7 +46,7 @@ source_harness_lib() {
   source "$HARNESS_PROJECT_DIR/harness/lib/$lib"
 }
 
-# Copy a fixture file from meta-tests/helpers/fixtures/ to a destination, creating parent directories
+# Copy a fixture file from the fixtures directory to a destination, creating parent directories
 install_fixture() {
   local fixture="$1"
   local dest="$2"
