@@ -1,0 +1,20 @@
+{
+  "projectName": "",
+  "completedSprints": [
+    1
+  ],
+  "currentSprint": 2,
+  "totalSprints": 0,
+  "completedFeatures": [],
+  "keyFiles": {},
+  "techStack": {},
+  "outstandingIssues": [],
+  "devServerCommand": "",
+  "devServerPort": 0,
+  "git": {
+    "harnessBranch": "",
+    "latestTag": "harness/sprint-01/pass",
+    "latestMergeSha": "Deleted branch harness/build-a-comprehensive-bats-core-test-suite-for-thi-sprint-01 (was 6a4040e).\nf415c0a012fc3d829bc49300f77253f9e2c668e0",
+    "prNumbers": []
+  }
+}
