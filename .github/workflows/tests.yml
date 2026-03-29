@@ -1,0 +1,28 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  layer1:
+    name: Layer 1 - Unit & Integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats-core
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Make scripts executable
+        run: chmod +x harness/orchestrate.sh harness/lib/*.sh harness/hooks/*.sh tests/helpers/claude tests/run-all.sh
+
+      - name: Run Layer 1 tests
+        run: bash tests/run-all.sh layer1

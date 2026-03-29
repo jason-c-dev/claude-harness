@@ -1,7 +1,7 @@
 # Claude Harness
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests: 74/74](https://img.shields.io/badge/tests-74%2F74-brightgreen.svg)](#testing)
+[![Tests](https://github.com/jason-c-dev/claude-harness/actions/workflows/tests.yml/badge.svg)](https://github.com/jason-c-dev/claude-harness/actions/workflows/tests.yml)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-compatible-blue.svg)](https://docs.anthropic.com/en/docs/claude-code)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/jason-c-dev/claude-harness/pulls)
 
