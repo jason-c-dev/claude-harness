@@ -1,0 +1,261 @@
+{
+  "sprintNumber": 2,
+  "sprintName": "Pure Function Unit Tests",
+  "features": [
+    "F4: Unit Tests for Pure Functions (meta-tests/test-utils-pure.bats)"
+  ],
+  "criteria": [
+    {
+      "id": "C2-01",
+      "category": "structure",
+      "description": "File meta-tests/test-utils-pure.bats exists and loads the test helper via 'load helpers/test-helper'",
+      "testMethod": "file-inspection",
+      "testSteps": "Verify meta-tests/test-utils-pure.bats exists. Read the file and confirm it contains \"load 'helpers/test-helper'\" (or equivalent load directive).",
+      "threshold": "File exists and loads test-helper"
+    },
+    {
+      "id": "C2-02",
+      "category": "structure",
+      "description": "test-utils-pure.bats sources harness/lib/utils.sh via the source_harness_lib helper so all pure functions are available",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-utils-pure.bats. Verify it calls source_harness_lib 'utils.sh' (either in a setup function or at the top level) before any tests run.",
+      "threshold": "source_harness_lib 'utils.sh' is called before tests execute"
+    },
+    {
+      "id": "C2-03",
+      "category": "functionality",
+      "description": "slugify: converts uppercase to lowercase",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks slugify converts 'Hello World' or similar mixed-case input to all lowercase output.",
+      "threshold": "Test passes, e.g. slugify 'HELLO' produces 'hello'"
+    },
+    {
+      "id": "C2-04",
+      "category": "functionality",
+      "description": "slugify: replaces special characters with hyphens",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks slugify replaces non-alphanumeric characters (spaces, underscores, dots, etc.) with hyphens.",
+      "threshold": "Test passes, e.g. slugify 'hello world' produces 'hello-world'"
+    },
+    {
+      "id": "C2-05",
+      "category": "functionality",
+      "description": "slugify: collapses consecutive special characters into a single hyphen",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks slugify collapses multiple consecutive special characters (e.g., '---', '  ', '!@#') into a single hyphen.",
+      "threshold": "Test passes, e.g. slugify 'hello---world' produces 'hello-world'"
+    },
+    {
+      "id": "C2-06",
+      "category": "functionality",
+      "description": "slugify: strips leading and trailing hyphens",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks slugify removes leading/trailing hyphens from the result.",
+      "threshold": "Test passes, e.g. slugify '---hello---' produces 'hello'"
+    },
+    {
+      "id": "C2-07",
+      "category": "functionality",
+      "description": "slugify: truncates output to 50 characters",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that provides input longer than 50 characters and verifies the output is at most 50 characters.",
+      "threshold": "Test passes, output length <= 50"
+    },
+    {
+      "id": "C2-08",
+      "category": "functionality",
+      "description": "slugify: handles empty string input",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that calls slugify with an empty string and verifies the result is empty or a defined sentinel.",
+      "threshold": "Test passes, slugify '' produces empty string"
+    },
+    {
+      "id": "C2-09",
+      "category": "functionality",
+      "description": "slugify: passes through already-slugified input unchanged",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that calls slugify with input that is already in slug form (e.g., 'already-slugified') and verifies output matches input.",
+      "threshold": "Test passes, slugify 'already-slugified' produces 'already-slugified'"
+    },
+    {
+      "id": "C2-10",
+      "category": "functionality",
+      "description": "slugify: handles spaces and tabs correctly",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that calls slugify with input containing spaces and/or tabs and verifies they are replaced with hyphens.",
+      "threshold": "Test passes, spaces and tabs become hyphens"
+    },
+    {
+      "id": "C2-11",
+      "category": "functionality",
+      "description": "slugify: handles mixed case with numbers",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that calls slugify with input like 'Build V2 App' and verifies correct slug output (e.g., 'build-v2-app').",
+      "threshold": "Test passes, mixed case with numbers produces correct slug"
+    },
+    {
+      "id": "C2-12",
+      "category": "functionality",
+      "description": "sprint_pad: pads single digit to two digits with leading zero",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks sprint_pad 3 produces '03'.",
+      "threshold": "Test passes, sprint_pad 3 == '03'"
+    },
+    {
+      "id": "C2-13",
+      "category": "functionality",
+      "description": "sprint_pad: preserves double-digit numbers as-is",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks sprint_pad 12 produces '12'.",
+      "threshold": "Test passes, sprint_pad 12 == '12'"
+    },
+    {
+      "id": "C2-14",
+      "category": "functionality",
+      "description": "sprint_pad: pads zero to '00'",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks sprint_pad 0 produces '00'.",
+      "threshold": "Test passes, sprint_pad 0 == '00'"
+    },
+    {
+      "id": "C2-15",
+      "category": "functionality",
+      "description": "sprint_pad: handles large numbers (100+) without truncation",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks sprint_pad 100 produces '100' (not truncated to 2 digits).",
+      "threshold": "Test passes, sprint_pad 100 == '100'"
+    },
+    {
+      "id": "C2-16",
+      "category": "functionality",
+      "description": "sprint_dir: constructs correct path for single-digit sprint number",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks sprint_dir 3 produces 'harness-state/sprints/sprint-03' (or equivalent with HARNESS_STATE prefix).",
+      "threshold": "Test passes with correct path including zero-padded sprint number"
+    },
+    {
+      "id": "C2-17",
+      "category": "functionality",
+      "description": "sprint_dir: constructs correct path for double-digit sprint number",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that checks sprint_dir 12 produces correct path ending in 'sprint-12'.",
+      "threshold": "Test passes with correct path"
+    },
+    {
+      "id": "C2-18",
+      "category": "functionality",
+      "description": "sprint_dir: respects HARNESS_STATE environment variable override",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that sets HARNESS_STATE to a custom value (e.g., 'custom-state') and verifies sprint_dir uses that prefix in the output path.",
+      "threshold": "Test passes, output uses custom HARNESS_STATE value"
+    },
+    {
+      "id": "C2-19",
+      "category": "functionality",
+      "description": "json_read: reads a top-level field from a JSON file",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that creates a JSON file with a top-level field and checks json_read returns the correct value.",
+      "threshold": "Test passes, correct value returned"
+    },
+    {
+      "id": "C2-20",
+      "category": "functionality",
+      "description": "json_read: reads a nested field using dot-path notation",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that reads a nested field (e.g., '.git.branch') from a JSON file.",
+      "threshold": "Test passes, nested value returned correctly"
+    },
+    {
+      "id": "C2-21",
+      "category": "functionality",
+      "description": "json_read: reads an array element",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that reads an array element (e.g., '.sprints[0].name') from a JSON file.",
+      "threshold": "Test passes, correct array element value returned"
+    },
+    {
+      "id": "C2-22",
+      "category": "functionality",
+      "description": "json_read: returns empty string for missing/nonexistent file",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that calls json_read on a file that does not exist and verifies the result is an empty string.",
+      "threshold": "Test passes, empty string returned for missing file"
+    },
+    {
+      "id": "C2-23",
+      "category": "functionality",
+      "description": "json_read: returns empty/null for missing field in valid JSON",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that reads a field that does not exist in a valid JSON file and verifies the return is empty or 'null'.",
+      "threshold": "Test passes, empty or 'null' returned for missing field"
+    },
+    {
+      "id": "C2-24",
+      "category": "functionality",
+      "description": "json_read: handles malformed JSON gracefully without crashing",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that calls json_read on a file containing malformed JSON (e.g., '{invalid}') and verifies it returns empty string without a non-zero exit code propagating.",
+      "threshold": "Test passes, no crash, empty string returned"
+    },
+    {
+      "id": "C2-25",
+      "category": "functionality",
+      "description": "file_exists: returns true (exit 0) for a non-empty file",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that creates a file with content and verifies file_exists returns exit code 0.",
+      "threshold": "Test passes, exit code 0"
+    },
+    {
+      "id": "C2-26",
+      "category": "functionality",
+      "description": "file_exists: returns false (exit non-zero) for a missing file",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that calls file_exists on a path that does not exist and verifies exit code is non-zero.",
+      "threshold": "Test passes, exit code non-zero"
+    },
+    {
+      "id": "C2-27",
+      "category": "functionality",
+      "description": "file_exists: returns false (exit non-zero) for an empty file (zero bytes)",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that creates an empty file (touch) and verifies file_exists returns non-zero.",
+      "threshold": "Test passes, exit code non-zero for empty file"
+    },
+    {
+      "id": "C2-28",
+      "category": "functionality",
+      "description": "file_exists: returns false (exit non-zero) for a directory path",
+      "testMethod": "command",
+      "testSteps": "Run test-utils-pure.bats. Verify a test exists and passes that passes a directory path to file_exists and verifies exit code is non-zero.",
+      "threshold": "Test passes, exit code non-zero for directory"
+    },
+    {
+      "id": "C2-29",
+      "category": "integration",
+      "description": "All tests in test-utils-pure.bats pass when run via bash meta-tests/run.sh",
+      "testMethod": "command",
+      "testSteps": "Run: bash meta-tests/run.sh --filter 'slugify|sprint_pad|sprint_dir|json_read|file_exists' 2>&1 (or simply run bash meta-tests/run.sh). Verify exit code 0 and all tests in test-utils-pure.bats pass.",
+      "threshold": "Exit code 0, all tests pass"
+    },
+    {
+      "id": "C2-30",
+      "category": "quality",
+      "description": "Test names are self-documenting sentences that identify the function under test and the specific behavior (e.g., 'slugify: collapses consecutive hyphens')",
+      "testMethod": "code-inspection",
+      "testSteps": "Read test-utils-pure.bats. Verify every @test name follows the pattern 'function_name: description of behavior'. Each test name should clearly identify which function is being tested and what specific behavior is asserted.",
+      "threshold": "All @test names follow 'function: behavior' naming convention"
+    }
+  ],
+  "outOfScope": [
+    "State management function tests (Sprint 3: test-utils-state.bats -- init_harness_state, log_cost, update_progress, update_handoff, update_regression_registry)",
+    "Git operation tests (Sprint 4: test-git.bats)",
+    "Hook validation tests (Sprint 5: test-hooks.bats)",
+    "Edge case and error handling tests (Sprint 6: test-edge-cases.bats)",
+    "Any modifications to the existing harness source code in harness/lib/utils.sh",
+    "Any modifications to the existing tests/ directory",
+    "Any modifications to sprint 1 deliverables (run.sh, test-helper.bash, fixtures, test-infrastructure.bats)",
+    "CI/CD pipeline integration",
+    "Performance benchmarks or timing assertions"
+  ],
+  "regressionSprints": [1]
+}
