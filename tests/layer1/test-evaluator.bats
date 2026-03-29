@@ -21,6 +21,7 @@ setup() {
 
   SCRIPT_DIR="$PROJECT_DIR/harness/lib"
   source "$PROJECT_DIR/harness/lib/utils.sh"
+  source "$PROJECT_DIR/harness/lib/invoke.sh"
   init_harness_state "Test" "general"
 
   cp "$FIXTURE_DIR/contract-sprint01.json" "$HARNESS_STATE/sprints/sprint-01/contract.json"

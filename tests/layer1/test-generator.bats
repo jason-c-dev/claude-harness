@@ -21,6 +21,7 @@ setup() {
 
   SCRIPT_DIR="$PROJECT_DIR/harness/lib"
   source "$PROJECT_DIR/harness/lib/utils.sh"
+  source "$PROJECT_DIR/harness/lib/invoke.sh"
   init_harness_state "Test" "general"
 
   # Install a contract so generator has something to work with

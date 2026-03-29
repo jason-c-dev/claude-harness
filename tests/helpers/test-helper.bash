@@ -50,6 +50,10 @@ source_harness_lib() {
   local lib="$1"
   # Set SCRIPT_DIR so libs can find siblings via source
   SCRIPT_DIR="$PROJECT_DIR/harness/lib"
+  # Ensure invoke_claude is available (needed by planner, generator, evaluator, contract)
+  if ! declare -f invoke_claude &>/dev/null; then
+    source "$PROJECT_DIR/harness/lib/invoke.sh"
+  fi
   source "$PROJECT_DIR/harness/lib/$lib"
 }
 
