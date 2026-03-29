@@ -28,16 +28,15 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HARNESS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+export HARNESS_ROOT
 
-# Ensure .claude/ config (agents, hooks, settings) exists in the working directory.
-# When running externally (bash ~/harness/orchestrate.sh from a fresh project),
-# Claude Code loads .claude/ from cwd, not from where the script lives.
-if [[ ! -f ".claude/settings.json" ]] && [[ -d "${HARNESS_ROOT}/.claude" ]]; then
-  log_info "Copying harness .claude/ config to working directory..." 2>/dev/null || true
+# Ensure .claude/agents/ and .claude/skills/ exist in the working directory.
+# When running externally, Claude Code loads these from cwd.
+# Settings/hooks are loaded via --settings flag in invoke_claude (no clobber risk).
+if [[ -d "${HARNESS_ROOT}/.claude" ]]; then
   mkdir -p .claude
   cp -rn "${HARNESS_ROOT}/.claude/agents" .claude/ 2>/dev/null || true
   cp -rn "${HARNESS_ROOT}/.claude/skills" .claude/ 2>/dev/null || true
-  cp -n "${HARNESS_ROOT}/.claude/settings.json" .claude/settings.json 2>/dev/null || true
 fi
 
 source "${SCRIPT_DIR}/lib/utils.sh"

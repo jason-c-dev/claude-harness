@@ -27,6 +27,13 @@ invoke_claude() {
     --verbose
   )
 
+  # Load harness settings (hooks, etc.) via --settings flag.
+  # This merges with any existing .claude/settings.json without clobbering.
+  local harness_settings="${HARNESS_ROOT:-.}/.claude/settings.json"
+  if [[ -f "$harness_settings" ]]; then
+    cmd+=(--settings "$harness_settings")
+  fi
+
   if [[ -n "$mcp_config" ]]; then
     cmd+=(--mcp-config "$mcp_config")
   fi
