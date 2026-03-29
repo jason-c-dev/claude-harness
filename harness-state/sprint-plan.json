@@ -1,0 +1,66 @@
+{
+  "sprints": [
+    {
+      "number": 1,
+      "name": "Test Infrastructure Foundation",
+      "theme": "Scaffolding: directory structure, test helper, fixtures, and run.sh entry point",
+      "features": [
+        "F1: Test Runner Entry Point (meta-tests/run.sh)",
+        "F2: Test Helper Library (meta-tests/helpers/test-helper.bash)",
+        "F3: Fixture Files (meta-tests/helpers/fixtures/)"
+      ],
+      "dependsOn": [],
+      "estimatedComplexity": "low"
+    },
+    {
+      "number": 2,
+      "name": "Pure Function Unit Tests",
+      "theme": "Unit tests for all stateless pure functions in harness/lib/utils.sh",
+      "features": [
+        "F4: Unit Tests for Pure Functions (meta-tests/test-utils-pure.bats)"
+      ],
+      "dependsOn": [1],
+      "estimatedComplexity": "low"
+    },
+    {
+      "number": 3,
+      "name": "State Management Unit Tests",
+      "theme": "Tests for state-mutating functions: init_harness_state, log_cost, update_progress, update_handoff, update_regression_registry",
+      "features": [
+        "F5: Unit Tests for State Management Functions (meta-tests/test-utils-state.bats)"
+      ],
+      "dependsOn": [1],
+      "estimatedComplexity": "medium"
+    },
+    {
+      "number": 4,
+      "name": "Git Operation Tests",
+      "theme": "Tests for all git.sh functions using isolated temporary git repositories",
+      "features": [
+        "F6: Git Operation Tests (meta-tests/test-git.bats)"
+      ],
+      "dependsOn": [1],
+      "estimatedComplexity": "high"
+    },
+    {
+      "number": 5,
+      "name": "Hook Validation Tests",
+      "theme": "Tests for on-generator-stop.sh, on-evaluator-stop.sh, and on-stop.sh exit codes and error messages",
+      "features": [
+        "F7: Hook Validation Tests (meta-tests/test-hooks.bats)"
+      ],
+      "dependsOn": [1],
+      "estimatedComplexity": "medium"
+    },
+    {
+      "number": 6,
+      "name": "Edge Cases and Polish",
+      "theme": "Boundary conditions, malformed input, error recovery, and run.sh integration verification",
+      "features": [
+        "F8: Edge Case and Error Handling Tests (meta-tests/test-edge-cases.bats)"
+      ],
+      "dependsOn": [2, 3, 4, 5],
+      "estimatedComplexity": "medium"
+    }
+  ]
+}
