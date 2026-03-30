@@ -358,8 +358,9 @@ run_fix() {
   harness_branch=$(json_read "${HARNESS_STATE}/handoff.json" ".git.harnessBranch")
   git checkout "$harness_branch"
 
-  # Create GitHub issue
-  git_create_issue "Bug: ${USER_PROMPT}" "## Reported behavior\n${USER_PROMPT}\n\n## Harness tracking\nAutomated fix via harness."
+  # Create GitHub issue (capture issue number for PR)
+  local issue_number
+  issue_number=$(git_create_issue "Bug: ${USER_PROMPT}" "## Reported behavior\n${USER_PROMPT}\n\n## Harness tracking\nAutomated fix via harness.")
 
   # Determine fix sprint number
   local fix_count
@@ -390,13 +391,11 @@ run_fix() {
 
   # Evaluate fix
   if invoke_evaluator "${fix_id}" 1; then
-    git checkout "$harness_branch"
-    git merge --no-ff "$sprint_branch" -m "harness(${fix_id}): merge fix (PASS)"
     git tag "harness/${fix_id}/pass"
-    git branch -d "$sprint_branch"
     update_regression_registry "$fix_id"
     git_commit_harness_state "harness(${fix_id}): fix verified"
-    log_success "Fix verified and merged"
+    git_create_fix_pr "$sprint_branch" "$harness_branch" "$fix_id" "${USER_PROMPT}" "$issue_number"
+    log_success "Fix verified -- PR created"
   else
     log_error "Fix did not pass evaluation. See ${fix_dir}/eval-report.json"
   fi

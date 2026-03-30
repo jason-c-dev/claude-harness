@@ -145,25 +145,91 @@ git_create_pr() {
     --body "$pr_body"
 }
 
-# Create a GitHub issue for a bug fix
+# Create a PR for a fix branch (instead of merging locally)
+git_create_fix_pr() {
+  local fix_branch="$1"
+  local base_branch="$2"
+  local fix_id="$3"
+  local bug_description="$4"
+  local issue_number="${5:-}"
+
+  if ! command -v gh &>/dev/null; then
+    log_warn "gh CLI not found -- skipping PR creation"
+    log_info "Fix branch ready: ${fix_branch}"
+    log_info "Create PR manually: git push && gh pr create"
+    return
+  fi
+
+  if ! git remote get-url origin &>/dev/null; then
+    log_warn "No git remote configured -- skipping PR creation"
+    log_info "Fix branch ready: ${fix_branch}"
+    return
+  fi
+
+  # If the base branch doesn't exist on the remote, fall back to default branch
+  if ! git ls-remote --heads origin "$base_branch" | grep -q .; then
+    local fallback
+    fallback=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+    log_warn "Base branch '${base_branch}' not found on remote, falling back to '${fallback}'"
+    base_branch="$fallback"
+  fi
+
+  log_info "Pushing fix branch and creating PR..."
+  git push -u origin "$fix_branch"
+  git push origin "harness/${fix_id}/pass" 2>/dev/null || true
+
+  local issue_ref=""
+  if [[ -n "$issue_number" ]]; then
+    issue_ref="Fixes #${issue_number}"
+  fi
+
+  local pr_body="## Fix: ${fix_id}
+
+### Bug
+${bug_description}
+
+### Verification
+- Fix evaluated and passed all criteria
+- Regression registry updated
+${issue_ref}
+
+---
+Built with the [Planner-Generator-Evaluator Harness](https://www.anthropic.com/engineering/harness-design-long-running-apps)"
+
+  gh pr create \
+    --base "$base_branch" \
+    --head "$fix_branch" \
+    --title "harness(${fix_id}): ${bug_description:0:50}" \
+    --body "$pr_body"
+}
+
+# Create a GitHub issue for a bug fix. Echoes the issue number to stdout.
 git_create_issue() {
   local title="$1"
   local body="$2"
 
   if ! command -v gh &>/dev/null; then
     log_warn "gh CLI not found -- skipping issue creation"
+    echo ""
     return
   fi
 
   if ! git remote get-url origin &>/dev/null; then
     log_warn "No git remote configured -- skipping issue creation"
+    echo ""
     return
   fi
 
-  gh issue create \
+  local issue_url
+  issue_url=$(gh issue create \
     --title "$title" \
     --body "$body" \
-    --label "harness-fix,bug" 2>/dev/null || log_warn "Failed to create issue"
+    --label "harness-fix,bug" 2>/dev/null) || { log_warn "Failed to create issue"; echo ""; return; }
+
+  # Extract issue number from URL (e.g., https://github.com/owner/repo/issues/42 -> 42)
+  local issue_number
+  issue_number=$(echo "$issue_url" | grep -o '[0-9]*$')
+  echo "$issue_number"
 }
 
 # Generate PR body from harness state

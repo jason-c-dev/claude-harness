@@ -19,8 +19,14 @@ Fix bug: $ARGUMENTS
 4. Create a fix branch from the harness branch
 5. Delegate to @"generator (agent)": fix the bug against the contract
 6. Delegate to @"evaluator (agent)": verify the fix + regression
-7. On PASS: merge, tag, update regression registry
-8. The PR should reference the GitHub issue: `Fixes #N`
+7. On PASS:
+   - Tag `harness/{fix-id}/pass` on the fix branch
+   - Update regression registry
+   - Commit harness state
+   - Push the fix branch: `git push -u origin {fix-branch}`
+   - Create a PR: `gh pr create --base {harness-branch-or-main} --head {fix-branch} --title "harness({fix-id}): {description}" --body "..."`
+   - The PR body must include `Fixes #{issue-number}` to auto-close the GitHub issue
+8. Do NOT merge locally. The fix goes through a PR for review.
 
 The fix contract should be narrow and surgical -- just enough criteria to verify the fix
 and ensure nothing else broke.

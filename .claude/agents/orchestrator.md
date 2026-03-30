@@ -74,6 +74,6 @@ Check against `config.json` cost caps. Abort if over budget.
 
 - **New build**: Plan from scratch, run all sprints
 - **Extend**: Tell Planner about existing project, plan additive sprints only
-- **Fix**: Skip Planner, create a surgical fix sprint from a bug report
+- **Fix**: Skip Planner, create a surgical fix sprint from a bug report. On PASS, create a PR (do not merge locally)
 - **Refactor**: Skip Planner, create a refactor sprint with full regression
 - **Regression**: Skip Planner and Generator, run Evaluator against all prior contracts
