@@ -138,10 +138,16 @@ git_create_pr() {
   local base_branch
   base_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
 
+  local pr_title="harness: ${project_slug}"
+  # GitHub PR title limit is 256 characters
+  if [[ ${#pr_title} -gt 256 ]]; then
+    pr_title="${pr_title:0:253}..."
+  fi
+
   gh pr create \
     --base "$base_branch" \
     --head "$harness_branch" \
-    --title "harness: ${project_slug}" \
+    --title "$pr_title" \
     --body "$pr_body"
 }
 
