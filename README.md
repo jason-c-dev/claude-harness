@@ -746,6 +746,20 @@ Options:
   --dry-run             Show plan without executing
 ```
 
+## Architecture: Engine vs Workflow
+
+The harness is the **engine** -- a multi-agent orchestrator that takes a prompt, runs planner/generator/evaluator agents through sprint cycles, and produces working code on a git branch. It coordinates `claude -p` processes via files and git branches.
+
+The engine intentionally does NOT include:
+- GitHub issue integration (reading issues as input, auto-closing on merge)
+- CI/CD workflow features (bootstrapping existing repos, syncing agent definitions)
+- Monitoring and notifications (Telegram alerts, progress dashboards)
+- Interactive workflow overlays (pause points, user approval gates)
+
+These belong in a **workflow layer** that wraps the engine. The workflow layer resolves inputs, manages branch lifecycle, and handles developer experience -- then calls the engine to do the actual work. This separation keeps the engine simple and testable, and prevents self-referential issues when the harness operates on its own codebase.
+
+See [#14](https://github.com/jason-c-dev/claude-harness/issues/14) for the architectural discussion and planned workflow features.
+
 ## Testing
 
 The harness has a three-layer test suite. The `tests/` directory is for harness development only -- it is NOT copied when embedding the harness in a target project.
