@@ -311,29 +311,34 @@ run_extend() {
     exit 1
   fi
 
-  # Update config with new prompt
+  local harness_branch
+  harness_branch=$(json_read "${HARNESS_STATE}/handoff.json" ".git.harnessBranch")
+  git checkout "$harness_branch"
+
+  # Update config with new prompt (after checkout so we modify the harness branch copy)
   local tmp
   tmp=$(mktemp)
   jq --arg prompt "$USER_PROMPT" '.userPrompt = $prompt' \
     "${HARNESS_STATE}/config.json" > "$tmp" && mv "$tmp" "${HARNESS_STATE}/config.json"
 
-  local harness_branch
-  harness_branch=$(json_read "${HARNESS_STATE}/handoff.json" ".git.harnessBranch")
-  git checkout "$harness_branch"
-
-  # Count existing sprints before planning
-  local existing_sprints=0
-  if file_exists "${HARNESS_STATE}/sprint-plan.json"; then
-    existing_sprints=$(jq '.sprints | length' "${HARNESS_STATE}/sprint-plan.json" 2>/dev/null || echo 0)
-  fi
+  # Count completed sprints (those with a passing eval report)
+  local completed_sprints=0
+  for dir in "${HARNESS_STATE}"/sprints/sprint-*/; do
+    [[ -d "$dir" ]] || continue
+    local result
+    result=$(json_read "${dir}eval-report.json" ".overallResult" 2>/dev/null)
+    if [[ "$result" == "PASS" ]]; then
+      completed_sprints=$(( completed_sprints + 1 ))
+    fi
+  done
 
   # Plan (extend mode)
   local total_sprints
   total_sprints=$(invoke_planner "extend")
   git_commit_harness_state "harness(plan): extend with new features"
 
-  local sprint_count=$(( total_sprints - existing_sprints ))
-  local new_start=$(( existing_sprints + 1 ))
+  local new_start=$(( completed_sprints + 1 ))
+  local sprint_count=$(( total_sprints - completed_sprints ))
 
   log_info "Added ${sprint_count} new sprints (${new_start}-${total_sprints})"
 
