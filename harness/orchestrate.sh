@@ -321,14 +321,19 @@ run_extend() {
   harness_branch=$(json_read "${HARNESS_STATE}/handoff.json" ".git.harnessBranch")
   git checkout "$harness_branch"
 
+  # Count existing sprints before planning
+  local existing_sprints=0
+  if file_exists "${HARNESS_STATE}/sprint-plan.json"; then
+    existing_sprints=$(jq '.sprints | length' "${HARNESS_STATE}/sprint-plan.json" 2>/dev/null || echo 0)
+  fi
+
   # Plan (extend mode)
-  local sprint_count
-  sprint_count=$(invoke_planner "extend")
+  local total_sprints
+  total_sprints=$(invoke_planner "extend")
   git_commit_harness_state "harness(plan): extend with new features"
 
-  local total_sprints
-  total_sprints=$(json_read "${HARNESS_STATE}/sprint-plan.json" ".sprints | length")
-  local new_start=$(( total_sprints - sprint_count + 1 ))
+  local sprint_count=$(( total_sprints - existing_sprints ))
+  local new_start=$(( existing_sprints + 1 ))
 
   log_info "Added ${sprint_count} new sprints (${new_start}-${total_sprints})"
 
